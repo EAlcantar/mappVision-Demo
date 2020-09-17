@@ -32,7 +32,7 @@ VAR
 	visEnableVision : BOOL; (*Enable vision function*)
 	visAutoArchiv : BOOL; (*Enable/Disable auto archiving of camera images*)
 	visImageTrigger : BOOL; (*Trigger new image*)
-	TriggerTimeout : TON; (*Disable web reload when timed out*)
+	TriggerTimeout : ARRAY[1..MAX_NUM_CAMS] OF TON; (*Disable web reload when timed out*)
 	visVisionApplicationList : ARRAY[0..19] OF STRING[80]; (*Flash color string*)
 	visSelectedFlashColor : STRING[10]; (*Flash color string*)
 	visSelectedFlashColorOld : STRING[10]; (*Flash color string*)
@@ -41,16 +41,17 @@ VAR
 	visRepetitiveMode : BOOL; (*Enable/Disable repetitive mode*)
 	RepetitiveModeTimer : TON; (*Timer for repetitive mode*)
 	DisableAutoArchiv : BOOL; (*Enable/Disable automatic archieving for images*)
-	AcquisitionFailedCntOld : UDINT; (*Old aquisition failed counter*)
-	AcquisitionCompletedCntOld : UDINT; (*Old aquisition completed counter*)
+	AcquisitionFailedCntOld : ARRAY[1..MAX_NUM_CAMS] OF UDINT; (*Old aquisition failed counter*)
+	AcquisitionCompletedCntOld : ARRAY[1..MAX_NUM_CAMS] OF UDINT; (*Old aquisition completed counter*)
 	InitialSearchSensor : BOOL; (*Flag for first boot*)
-	AutoSetupRunning : BOOL; (*Flag for auto setup running*)
+	AutoSetupRunning : ARRAY[1..MAX_NUM_CAMS] OF BOOL; (*Flag for auto setup running*)
 END_VAR
 (*-----------------------------------------------------------------------------------------------------------------------------------------*)
 (*Code Reader*)
 VAR
 	visSelectedCodeTypeDetected : ARRAY[1..MAX_NUM_RESULTS] OF STRING[80]; (*HMI helper string*)
-	visSelectedCodeTypePreset : STRING[80]; (*HMI helper string*)
+	visSelectedCodeTypeFromPLC : STRING[80]; (*HMI helper string*)
+	visSelectedCodeTypeToPLC : STRING[80]; (*HMI helper string*)
 	visCodeTypePresentDropDownValues : ARRAY[0..MAX_NUM_CODETYPES] OF STRING[80];
 END_VAR
 (*-----------------------------------------------------------------------------------------------------------------------------------------*)
@@ -69,5 +70,6 @@ VAR CONSTANT
 	ERR_VA_LIST_NUM : UINT := 30000; (*Number of applications exceeds array size*)
 END_VAR
 VAR
-	TON_DelayAfterAutoSetup : TON;
+	TON_DelayAfterAutoSetup : ARRAY[1..MAX_NUM_CAMS] OF TON;
+	visVaListRefresh : BOOL;
 END_VAR

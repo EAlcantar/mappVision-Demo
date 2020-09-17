@@ -21,9 +21,6 @@
   <DataObjects>
     <DataObject Name="McAcpSys" Source="" Memory="UserROM" Language="Binary" />
   </DataObjects>
-  <VcDataObjects>
-    <VcDataObject Name="Visu" Source="Vision.Visu.dob" Memory="UserROM" Language="Vc" WarningLevel="2" />
-  </VcDataObjects>
   <Binaries>
     <BinaryObject Name="udbdef" Source="" Memory="UserROM" Language="Binary" />
     <BinaryObject Name="mvLoader" Source="" Memory="UserROM" Language="Binary" />

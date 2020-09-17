@@ -31,6 +31,7 @@
 		<EventBindingsSet refId="Footer_eventbinding" />
 		<EventBindingsSet refId="Navigation_eventbinding" />
 		<EventBindingsSet refId="Main_eventbinding" />
+		<EventBindingsSet refId="Results_eventbinding" />
 		<EventBindingsSet refId="Lights_eventbinding" />
 		<EventBindingsSet refId="Recipe_eventbinding" />
 		<EventBindingsSet refId="ImageArchiv_eventbinding" />
@@ -40,11 +41,11 @@
 	</Dialogs>
 	<Contents preCache="all">
 		<Content refId="contentResult" />
-		<Content refId="contentBlob" />
-		<Content refId="contentMatch" />
-		<Content refId="contentMT" />
-		<Content refId="contentOCR" />
-		<Content refId="contentCodeReader" />
+		<Content refId="contentBlob" preCache="false"/>
+		<Content refId="contentMatch" preCache="false"/>
+		<Content refId="contentMT" preCache="false"/>
+		<Content refId="contentOCR" preCache="false"/>
+		<Content refId="contentCodeReader" preCache="false"/>
 	</Contents>
 	<SnippetsSets>
 		<!--<SnippetsSet refId=""/>-->
@@ -63,6 +64,8 @@
 		<Configuration key="activityCount" value="false" />
 		<Configuration key="zoom" value="true" />
 		<Configuration key="bootProgressBar" value="true" />
+		<Configuration key="bootLogo" value="Media/VisionEye.png" />
+		<Configuration key="bootColor" value="#000000" />
 		<Gestures>
 			<!--<SystemGesture1 touchPoints="2" />
 			<SystemGesture2 touchPoints="2" />

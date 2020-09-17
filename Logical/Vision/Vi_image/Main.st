@@ -4,19 +4,19 @@
 // - Download of the image in the browser
 // - Creates a html file to "resize" thei image for the mappview visualization (every size of the picuture matches the visu size)
 // - Draw crosshairs
-// Version 2.1
+// Version 2.2
 // --------------------------------------------------------------------------------------------------------------------
 PROGRAM _INIT
 	IF RemCfgImage.ConvertCycles = 0 THEN 							// Invalid --> use default values
-		gVisionImage.CFG.FileDevice 	:= DEVICE_NAME;				// File device name where the images are stored
-		gVisionImage.CFG.DirName		:= 'Vision';				// Directory used for images
-		gVisionImage.CFG.CameraIP		:= '192.168.200.';			// IP adress of the camera (see PLK settings)
-		gVisionImage.CFG.EthDevice		:= 'IF2';					// Device path of the PLCs ETH address
-		gVisionImage.CFG.ConvertCycles	:= 10000;					// Conversioncycles per step (TK8 call). Use higer value on high performance CPU, use lower values on low performance CPU or in case of cycle time violations
-		gVisionImage.CFG.Format			:= 0;						// Image type, use 0 for JPEG, 1 for bitmap
-		gVisionImage.CFG.QualityJPG		:= 80;						// Quality for JPG images, larger numbers produce better images. Allowed values: 0 to 100, but values < ca 10 makes no sense
-		gVisionImage.CFG.UploadBmpJpg	:= TRUE;
-		gVisionImage.CFG.UploadSVG		:= TRUE;
+		gVisionImage.CFG.FileDevice 		:= DEVICE_NAME;				// File device name where the images are stored
+		gVisionImage.CFG.DirName			:= 'Vision';				// Directory used for images
+		gVisionImage.CFG.PlkIPWithoutNode	:= '192.168.200.';			// IP adress of the plk interface, where the camera is connected to (see PLK settings), without the node (last part). Example: "192.168.200.0"
+		gVisionImage.CFG.EthDevice			:= 'IF2';					// Device path of the PLCs ETH address
+		gVisionImage.CFG.ConvertCycles		:= 10000;					// Conversioncycles per step (TK8 call). Use higer value on high performance CPU, use lower values on low performance CPU or in case of cycle time violations
+		gVisionImage.CFG.Format				:= 0;						// Image type, use 0 for JPEG, 1 for bitmap
+		gVisionImage.CFG.QualityJPG			:= 80;						// Quality for JPG images, larger numbers produce better images. Allowed values: 0 to 100, but values < ca 10 makes no sense
+		gVisionImage.CFG.UploadBmpJpg		:= TRUE;
+		gVisionImage.CFG.UploadSVG			:= TRUE;
 	ELSE
 		brsmemcpy(ADR(gVisionImage.CFG), ADR(RemCfgImage), SIZEOF(RemCfgImage)); // Restore default values from remanent memory
 	END_IF
@@ -96,7 +96,7 @@ PROGRAM _CYCLIC
 			DirCreate_0.pDevice		:= ADR(gVisionImage.CFG.FileDevice);
 			DirCreate_0.pName		:= ADR(gVisionImage.CFG.DirName);
 			DirCreate_0();
-			IF DirCreate_0.status = 0 OR DirCreate_0.status = fiERR_DIR_ALREADY_EXIST THEN
+			IF DirCreate_0.status = ERR_OK OR DirCreate_0.status = fiERR_DIR_ALREADY_EXIST THEN
 				Step := VISTEP_REFRESH_IMG_LIST;
 			ELSIF DirCreate_0.status <> ERR_FUB_BUSY THEN
 				gVisionImage.DAT.Status := DirCreate_0.status;
@@ -108,7 +108,7 @@ PROGRAM _CYCLIC
 			DirDeleteEx_0.pDevice	:= ADR(gVisionImage.CFG.FileDevice);
 			DirDeleteEx_0.pName		:= ADR(gVisionImage.CFG.DirName);
 			DirDeleteEx_0();
-			IF DirDeleteEx_0.status = 0 THEN
+			IF DirDeleteEx_0.status = ERR_OK THEN
 				Step := VISTEP_CREATE_DIR;
 			ELSIF DirDeleteEx_0.status <> ERR_FUB_BUSY THEN
 				gVisionImage.DAT.Status := DirDeleteEx_0.status;
@@ -120,7 +120,7 @@ PROGRAM _CYCLIC
 			FileDelete_0.pDevice	:= ADR(gVisionImage.CFG.FileDevice);
 			FileDelete_0.pName 		:= ADR(FileNameComplete);
 			FileDelete_0();
-			IF FileDelete_0.status = 0 THEN
+			IF FileDelete_0.status = ERR_OK THEN
 				Step := VISTEP_REFRESH_IMG_LIST;
 			ELSIF FileDelete_0.status <> ERR_FUB_BUSY THEN
 				gVisionImage.DAT.Status := FileDelete_0.status;
@@ -133,7 +133,7 @@ PROGRAM _CYCLIC
 			ViRefreshImageList_0.ImageList			:= ADR(visImageList);
 			ViRefreshImageList_0.visSelectedImage	:= ADR(visSelectedImage);
 			ViRefreshImageList_0();
-			IF ViRefreshImageList_0.Status = 0 THEN
+			IF ViRefreshImageList_0.Status = ERR_OK THEN
 				gVisionImage.DAT.Status := 0;
 				Step := VISTEP_WAIT;
 			ELSIF ViRefreshImageList_0.Status <> ERR_FUB_BUSY THEN
@@ -148,7 +148,7 @@ PROGRAM _CYCLIC
 			ViDownloadImage_0.ImgName				:= visSelectedImage;
 			ViDownloadImage_0.visDownloadFileUrl	:= ADR(visDownloadFileUrl);
 			ViDownloadImage_0();
-			IF ViDownloadImage_0.Status = 0 THEN
+			IF ViDownloadImage_0.Status = ERR_OK THEN
 				gVisionImage.DAT.Status := 0;
 				Step := VISTEP_WAIT;
 			ELSIF ViDownloadImage_0.Status <> ERR_FUB_BUSY THEN
@@ -162,7 +162,7 @@ PROGRAM _CYCLIC
 			ViSaveImgOnPlc_0.PowerlinkNode		:= gVisionSensor[LIMIT(1, visSelectedSensor, MAX_NUM_CAMS)].CFG.PowerlinkNode;
 			ViSaveImgOnPlc_0.CrossHairInfo		:= ADR(ViDrawCrosshair_0.CrossHairInfo);
 			ViSaveImgOnPlc_0();
-			IF ViSaveImgOnPlc_0.Status = 0 THEN
+			IF ViSaveImgOnPlc_0.Status = ERR_OK THEN
 				Step := VISTEP_REFRESH_IMG_LIST;
 			ELSIF ViSaveImgOnPlc_0.Status <> ERR_FUB_BUSY THEN
 				gVisionImage.DAT.Status := ViSaveImgOnPlc_0.Status;
@@ -193,6 +193,7 @@ PROGRAM _CYCLIC
 		ViCreateWebDirFile_0.Enable				:= TRUE;
 		ViCreateWebDirFile_0.FileDevUser		:= gVisionImage.CFG.FileDevice;
 		ViCreateWebDirFile_0.EthDevice			:= gVisionImage.CFG.EthDevice;
+		ViCreateWebDirFile_0.PlkIPWithoutNode	:= gVisionImage.CFG.PlkIPWithoutNode;
 		ViCreateWebDirFile_0.visWebViewerPath	:= ADR(visWebViewerPath);
 		ViCreateWebDirFile_0();
 	END_IF

@@ -14,7 +14,6 @@ TYPE
 		ImageTrigger : BOOL;
 		ImageTriggerReset : BOOL;
 		AutoSetupStartStop : BOOL;
-		VaListRefresh : BOOL;
 		VaSwitchApplication : BOOL;
 		SaveDiagData : BOOL;
 	END_STRUCT;
@@ -26,8 +25,6 @@ TYPE
 	END_STRUCT;
 	typVisionFunction : 	STRUCT 
 		ApplicationName : STRING[40];
-		ApplicationNameCnt : USINT;
-		ApplicationNameList : ARRAY[0..19]OF STRING[40];
 		Status : DINT;
 	END_STRUCT;
 	typVisionDiag : 	STRUCT 
@@ -68,6 +65,8 @@ TYPE
 		ResultCnt : USINT;
 		CockpitIsActive : BOOL;
 		Status : UDINT;
+		StatusText : STRING[30];
+		Active : BOOL;
 	END_STRUCT;
 	typVisionHW : 	STRUCT 
 		Connected : BOOL;
@@ -88,10 +87,10 @@ TYPE
 		(
 		enumFunctionNone,
 		enumBlob,
-		enumMatch,
 		enumCoderReader,
-		enumOCR,
-		enumMeasurement
+		enumMatch,
+		enumMeasurement,
+		enumOCR
 		);
 END_TYPE
 
@@ -115,8 +114,10 @@ TYPE
 	END_STRUCT;
 	typLightData : 	STRUCT 
 		Enable : USINT := 1;
-		FlashColor : USINT := 99;
+		FlashColor : USINT := 1;
+		FlashSegment : UINT := 15;
 		Exposure : UDINT := 200;
+		SetAngle : UINT;
 		Timeout : UINT := 5000;
 		NettimeDelay : DINT;
 		FlashAcceptedCnt : USINT;
@@ -131,13 +132,15 @@ TYPE
 		ID : UDINT;
 		Variant : UDINT;
 		Firmware : UDINT;
-		Temperature : SINT;
+		TemperatureLED : SINT;
+		TemperatureControllerBoard : SINT;
+		WarningCnt : USINT;
 	END_STRUCT;
 	enumLightType : 
 		(
 		enumLightNone,
 		enumBacklight,
-		enumBarlight
+		enumLightbar
 		);
 END_TYPE
 
@@ -191,7 +194,7 @@ TYPE
 	typVisionImageConfig : 	STRUCT 
 		FileDevice : STRING[80];
 		DirName : STRING[80];
-		CameraIP : STRING[80];
+		PlkIPWithoutNode : STRING[80];
 		EthDevice : STRING[80];
 		ConvertCycles : UDINT;
 		Format : USINT; (*0: jpg. 1: bmp*)
@@ -270,6 +273,10 @@ END_TYPE
 
 TYPE
 	recVariable : 	STRUCT 
+		Cam : ARRAY[1..MAX_NUM_CAMS]OF recVariableCam;
+		Light : ARRAY[1..MAX_NUM_LIGHTS]OF recVariableLight;
+	END_STRUCT;
+	recVariableCam : 	STRUCT 
 		ApplicationName : STRING[40];
 		MaxItemCnt : USINT := 10;
 		Timeout : UINT := 5000;
@@ -278,5 +285,12 @@ TYPE
 		Exposure : UDINT;
 		FlashColor : USINT := 1;
 		FlashSegment : USINT := 15;
+	END_STRUCT;
+	recVariableLight : 	STRUCT 
+		Timeout : UINT := 5000;
+		Exposure : UDINT;
+		FlashColor : USINT := 1;
+		FlashSegment : UINT := 15;
+		SetAngle : UINT := 45;
 	END_STRUCT;
 END_TYPE
