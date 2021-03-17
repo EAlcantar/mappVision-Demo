@@ -33,32 +33,6 @@
     <BinaryObject Name="McAcpSim" Source="" Memory="UserROM" Language="Binary" />
     <BinaryObject Name="McAcpDrv" Source="" Memory="UserROM" Language="Binary" />
     <BinaryObject Name="arflatprv" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="arcoal" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vccbtn" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vcpdvnc" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="arialbd" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vcmgr" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vcgclass" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vcfile" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vcfntttf" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vctcal" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vcdsloc" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="arial" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="Visu03" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vcalarm" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="Visu01" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vcpdsw" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vcchtml" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vcshared" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vcxml" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vccurl" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vcrt" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vcnet" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vcpfgen" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="Visu02" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vcbclass" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vcdsint" Source="" Memory="UserROM" Language="Binary" />
-    <BinaryObject Name="vccovl" Source="" Memory="UserROM" Language="Binary" />
     <BinaryObject Name="viAppOCR" Source="" Memory="UserROM" Language="Binary" />
     <BinaryObject Name="Settings" Source="" Memory="UserROM" Language="Binary" />
     <BinaryObject Name="iomap" Source="" Memory="UserROM" Language="Binary" />
@@ -86,6 +60,32 @@
     <BinaryObject Name="viAppBlob2" Source="" Memory="UserROM" Language="Binary" />
     <BinaryObject Name="viAppPixel" Source="" Memory="UserROM" Language="Binary" />
     <BinaryObject Name="viCompPxl" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="arcoal" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vccbtn" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vcpdvnc" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="arialbd" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vcmgr" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vcgclass" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vcfile" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vcfntttf" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vctcal" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vcdsloc" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="arial" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="Visu03" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vcalarm" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="Visu01" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vcpdsw" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vcchtml" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vcshared" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vcxml" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vccurl" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vcrt" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vcnet" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vcpfgen" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="Visu02" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vcbclass" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vcdsint" Source="" Memory="UserROM" Language="Binary" />
+    <BinaryObject Name="vccovl" Source="" Memory="UserROM" Language="Binary" />
     <BinaryObject Name="viAppBlob" Source="" Memory="UserROM" Language="Binary" />
   </Binaries>
   <Libraries>
@@ -106,21 +106,20 @@
     <LibraryObject Name="AsHttp" Source="Libraries.AsHttp.lby" Memory="UserROM" Language="binary" Debugging="true" />
     <LibraryObject Name="AsMem" Source="Libraries.AsMem.lby" Memory="UserROM" Language="binary" Debugging="true" />
     <LibraryObject Name="AsARCfg" Source="Libraries.AsARCfg.lby" Memory="UserROM" Language="binary" Debugging="true" />
-    <LibraryObject Name="CoTrace" Source="Libraries.CoTrace.lby" Memory="UserROM" Language="binary" Debugging="true" />
     <LibraryObject Name="IecCheck" Source="Libraries.IecCheck.lby" Memory="UserROM" Language="IEC" Debugging="true" />
-    <LibraryObject Name="MpRecipe" Source="Libraries.MpRecipe.lby" Memory="UserROM" Language="Binary" Debugging="true" />
-    <LibraryObject Name="MpBase" Source="Libraries.MpBase.lby" Memory="UserROM" Language="Binary" Debugging="true" />
     <LibraryObject Name="AsBrWStr" Source="Libraries.AsBrWStr.lby" Memory="UserROM" Language="binary" Debugging="true" />
     <LibraryObject Name="AsIODiag" Source="Libraries.AsIODiag.lby" Memory="UserROM" Language="binary" Debugging="true" />
-    <LibraryObject Name="McBase" Source="Libraries.McBase.lby" Memory="UserROM" Language="binary" Debugging="true" />
-    <LibraryObject Name="MpAxis" Source="Libraries.MpAxis.lby" Memory="UserROM" Language="binary" Debugging="true" />
-    <LibraryObject Name="McAxis" Source="Libraries.McAxis.lby" Memory="UserROM" Language="binary" Debugging="true" />
-    <LibraryObject Name="McAcpAx" Source="Libraries.McAcpAx.lby" Memory="UserROM" Language="binary" Debugging="true" />
-    <LibraryObject Name="ViBase" Source="Libraries.ViBase.lby" Memory="UserROM" Language="binary" Debugging="true" />
-    <LibraryObject Name="MpCom" Source="Libraries.MpCom.lby" Memory="UserROM" Language="Binary" Debugging="true" />
-    <LibraryObject Name="TcpForward" Source="Vision.TcpForward.lby" Memory="UserROM" Language="Binary" Debugging="true" />
     <LibraryObject Name="AsETH" Source="Libraries.AsETH.lby" Memory="UserROM" Language="binary" Debugging="true" />
+    <LibraryObject Name="McAxis" Source="Libraries.McAxis.lby" Memory="UserROM" Language="binary" Debugging="true" />
+    <LibraryObject Name="MpAxis" Source="Libraries.MpAxis.lby" Memory="UserROM" Language="binary" Debugging="true" />
+    <LibraryObject Name="MpBase" Source="Libraries.MpBase.lby" Memory="UserROM" Language="Binary" Debugging="true" />
+    <LibraryObject Name="MpCom" Source="Libraries.MpCom.lby" Memory="UserROM" Language="Binary" Debugging="true" />
+    <LibraryObject Name="MpRecipe" Source="Libraries.MpRecipe.lby" Memory="UserROM" Language="Binary" Debugging="true" />
+    <LibraryObject Name="CoTrace" Source="Libraries.CoTrace.lby" Memory="UserROM" Language="binary" Debugging="true" />
+    <LibraryObject Name="ViBase" Source="Libraries.ViBase.lby" Memory="UserROM" Language="binary" Debugging="true" />
+    <LibraryObject Name="McBase" Source="Libraries.McBase.lby" Memory="UserROM" Language="binary" Debugging="true" />
     <LibraryObject Name="arssl" Source="" Memory="UserROM" Language="Binary" Debugging="true" />
+    <LibraryObject Name="TcpForward" Source="Vision.TcpForward.lby" Memory="UserROM" Language="Binary" Debugging="true" />
     <LibraryObject Name="vcresman" Source="" Memory="UserROM" Language="Binary" Debugging="true" />
     <LibraryObject Name="dataobj" Source="" Memory="UserROM" Language="Binary" Debugging="true" />
   </Libraries>
