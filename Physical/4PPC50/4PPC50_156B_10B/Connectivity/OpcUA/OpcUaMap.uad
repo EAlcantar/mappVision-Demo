@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<OpcUaSource FileVersion="7" ArVersion="A4.73">
+<?AutomationStudio FileVersion="4.9"?>
+<OpcUaSource FileVersion="7" ArVersion="C4.90">
   <Aliases>
     <ACLAliases>
       <ACL Id="1">
@@ -47,65 +48,38 @@
         <Variable Name="gVisionLight" EnableArrayElements="True" />
         <Variable Name="gVisionNettime" AutomaticEnable="True" />
         <Variable Name="gVisionSensor" EnableArrayElements="True" />
+        <Variable Name="gVisionColor" AutomaticEnable="True">
+          <Variable Name="CMD" AutomaticEnable="True" />
+          <Variable Name="CFG" AutomaticEnable="True">
+            <Variable Name="FlashColor1" />
+            <Variable Name="FlashColor2" />
+            <Variable Name="FlashColor3" />
+            <Variable Name="FlashColor4" />
+            <Variable Name="ProductName" EnableArrayElements="True" />
+            <Variable Name="GrayValue1" EnableArrayElements="True" />
+            <Variable Name="GrayValue2" EnableArrayElements="True" />
+            <Variable Name="GrayValue3" EnableArrayElements="True" />
+            <Variable Name="GrayValue4" EnableArrayElements="True" />
+            <Variable Name="TeachingIndex" />
+            <Variable Name="MaxError" />
+            <Variable Name="MinDifference" />
+          </Variable>
+          <Variable Name="DAT" AutomaticEnable="True">
+            <Variable Name="GrayValue1" />
+            <Variable Name="GrayValue2" />
+            <Variable Name="GrayValue3" />
+            <Variable Name="GrayValue4" />
+            <Variable Name="TotalError" EnableArrayElements="True" />
+            <Variable Name="LowError" />
+            <Variable Name="LowDistance" />
+            <Variable Name="LowIndex" />
+            <Variable Name="LowName" />
+            <Variable Name="Status" />
+          </Variable>
+        </Variable>
+        <Variable Name="gCameraPxl" AutomaticEnable="True" />
       </GlobalVariables>
-      <Task Name="Vi_main">
-        <Variable Name="VisionSensor" AutomaticEnable="True" />
-        <Variable Name="Blob" AutomaticEnable="True">
-          <Variable Name="ModelNumber" EnableArrayElements="True" />
-          <Variable Name="Clipped" EnableArrayElements="True" />
-          <Variable Name="Area" EnableArrayElements="True" EngineeringUnitId="1" />
-          <Variable Name="PositionX" EnableArrayElements="True" EngineeringUnitId="1" />
-          <Variable Name="PositionY" EnableArrayElements="True" EngineeringUnitId="1" />
-          <Variable Name="Orientation" EnableArrayElements="True" EngineeringUnitId="1" />
-          <Variable Name="MeanGrayValue" EnableArrayElements="True" />
-          <Variable Name="Length" EnableArrayElements="True" EngineeringUnitId="1" />
-          <Variable Name="Width" EnableArrayElements="True" EngineeringUnitId="1" />
-        </Variable>
-        <Variable Name="CodeReader" AutomaticEnable="True">
-          <Variable Name="BarcodeText" EnableArrayElements="True" />
-          <Variable Name="BarcodeType" EnableArrayElements="True" />
-          <Variable Name="PositionX" EnableArrayElements="True" EngineeringUnitId="1" />
-          <Variable Name="PositionY" EnableArrayElements="True" EngineeringUnitId="1" />
-          <Variable Name="Orientation" EnableArrayElements="True" EngineeringUnitId="1" />
-          <Variable Name="Grading" EnableArrayElements="True" />
-          <Variable Name="EnhancedGrading" EnableArrayElements="True" />
-        </Variable>
-        <Variable Name="Match" AutomaticEnable="True">
-          <Variable Name="ModelNumber" EnableArrayElements="True" />
-          <Variable Name="Score" EnableArrayElements="True" />
-          <Variable Name="PositionX" EnableArrayElements="True" EngineeringUnitId="1" />
-          <Variable Name="PositionY" EnableArrayElements="True" EngineeringUnitId="1" />
-          <Variable Name="Orientation" EnableArrayElements="True" EngineeringUnitId="1" />
-          <Variable Name="Scale" EnableArrayElements="True" />
-          <Variable Name="RotCenterX" EnableArrayElements="True" EngineeringUnitId="1" />
-          <Variable Name="RotCenterY" EnableArrayElements="True" EngineeringUnitId="1" />
-        </Variable>
-        <Variable Name="MT" AutomaticEnable="True">
-          <Variable Name="Result" EnableArrayElements="True" EngineeringUnitId="1" />
-        </Variable>
-        <Variable Name="OCR" AutomaticEnable="True">
-          <Variable Name="Text" EnableArrayElements="True" />
-          <Variable Name="PositionX" EnableArrayElements="True" EngineeringUnitId="1" />
-          <Variable Name="PositionY" EnableArrayElements="True" EngineeringUnitId="1" />
-          <Variable Name="Orientation" EnableArrayElements="True" EngineeringUnitId="1" />
-          <Variable Name="Grading" EnableArrayElements="True" />
-        </Variable>
-        <Variable Name="visAutoArchiv" />
-        <Variable Name="visEnableCommand" />
-        <Variable Name="visEnableVision" />
-        <Variable Name="visImageTrigger" />
-        <Variable Name="visRepetitiveMode" />
-        <Variable Name="visSelectedCodeTypeDetected" EnableArrayElements="True" />
-        <Variable Name="visSelectedCodeTypePreset" />
-        <Variable Name="visSelectedFlashColor" />
-        <Variable Name="visTableNo" EnableArrayElements="True" />
-        <Variable Name="visEnableSetup" />
-        <Variable Name="visSelectedFlashSegment" EnableArrayElements="True" />
-        <Variable Name="visCameraStatus" />
-        <Variable Name="visCodeTypePresentDropDownValues" EnableArrayElements="True" />
-        <Variable Name="visVisionApplicationList" EnableArrayElements="True" />
-        <Variable Name="visEnableRepetitive" />
-      </Task>
+      <Task Name="Vi_main" />
       <Task Name="Vi_image">
         <Variable Name="visImagePath" />
         <Variable Name="visSelectedImage" />
@@ -120,6 +94,8 @@
         <Variable Name="visImageList" EnableArrayElements="True" />
         <Variable Name="visWebViewerPath" />
         <Variable Name="visWebViewerQuery" />
+        <Variable Name="visImageRotation" />
+        <Variable Name="visTextAlignment" />
       </Task>
       <Task Name="Recipe_01">
         <Variable Name="RECIPE" AutomaticEnable="True">
@@ -129,13 +105,6 @@
             <Variable Name="RecipeIDs" EnableArrayElements="True" />
           </Variable>
         </Variable>
-      </Task>
-      <Task Name="Vi_light">
-        <Variable Name="VisionLight" AutomaticEnable="True" />
-        <Variable Name="visEnableCommand" />
-        <Variable Name="visLightsTrigger" />
-        <Variable Name="visLightsReset" />
-        <Variable Name="visSelectedFlashColor" />
       </Task>
       <Task Name="Vi_nettime">
         <Variable Name="PowerlinkCycle_us" />
@@ -155,6 +124,88 @@
         <Variable Name="cmdAxisRun" />
         <Variable Name="MpAxisBasic_0" AutomaticEnable="True" />
         <Variable Name="cmdAxisErrorReset" />
+      </Task>
+      <Task Name="Vi_color">
+        <Variable Name="visSelectedProduct" />
+        <Variable Name="visTableNo" />
+      </Task>
+      <Task Name="Vi_visu">
+        <Variable Name="visCameraStatus" />
+        <Variable Name="visCodeTypePresentDropDownValues" />
+        <Variable Name="visEnableRepetitive" />
+        <Variable Name="visEnableSetup" />
+        <Variable Name="visImageTrigger" />
+        <Variable Name="VisionSensor" AutomaticEnable="True" />
+        <Variable Name="visRepetitiveMode" />
+        <Variable Name="visSelectedCodeTypeDetected" />
+        <Variable Name="visSelectedCodeTypeFromPLC" />
+        <Variable Name="visSelectedCodeTypeToPLC" />
+        <Variable Name="visSelectedFlashSegment" EnableArrayElements="True" />
+        <Variable Name="visTableNo" />
+        <Variable Name="visVaListRefresh" />
+        <Variable Name="visVisionApplicationList" />
+        <Variable Name="Blob" AutomaticEnable="True">
+          <Variable Name="ModelNumber" EnableArrayElements="True" />
+          <Variable Name="Clipped" EnableArrayElements="True" />
+          <Variable Name="Area" EnableArrayElements="True" />
+          <Variable Name="PositionX" EnableArrayElements="True" />
+          <Variable Name="PositionY" EnableArrayElements="True" />
+          <Variable Name="Orientation" EnableArrayElements="True" />
+          <Variable Name="MeanGrayValue" EnableArrayElements="True" />
+          <Variable Name="Length" EnableArrayElements="True" />
+          <Variable Name="Width" EnableArrayElements="True" />
+        </Variable>
+        <Variable Name="CodeReader" AutomaticEnable="True">
+          <Variable Name="BarcodeText" EnableArrayElements="True" />
+          <Variable Name="BarcodeType" EnableArrayElements="True" />
+          <Variable Name="PositionX" EnableArrayElements="True" />
+          <Variable Name="PositionY" EnableArrayElements="True" />
+          <Variable Name="Orientation" EnableArrayElements="True" />
+          <Variable Name="Grading" EnableArrayElements="True" />
+          <Variable Name="EnhancedGrading" EnableArrayElements="True" />
+        </Variable>
+        <Variable Name="Match" AutomaticEnable="True">
+          <Variable Name="ModelNumber" EnableArrayElements="True" />
+          <Variable Name="Score" EnableArrayElements="True" />
+          <Variable Name="PositionX" EnableArrayElements="True" />
+          <Variable Name="PositionY" EnableArrayElements="True" />
+          <Variable Name="Orientation" EnableArrayElements="True" />
+          <Variable Name="Scale" EnableArrayElements="True" />
+          <Variable Name="RotCenterX" EnableArrayElements="True" />
+          <Variable Name="RotCenterY" EnableArrayElements="True" />
+        </Variable>
+        <Variable Name="MT" AutomaticEnable="True">
+          <Variable Name="Result" EnableArrayElements="True" />
+        </Variable>
+        <Variable Name="OCR" AutomaticEnable="True">
+          <Variable Name="Text" EnableArrayElements="True" />
+          <Variable Name="Grading" EnableArrayElements="True" />
+          <Variable Name="PositionX" EnableArrayElements="True" />
+          <Variable Name="PositionY" EnableArrayElements="True" />
+          <Variable Name="Orientation" EnableArrayElements="True" />
+        </Variable>
+        <Variable Name="VisionLight" AutomaticEnable="True" />
+        <Variable Name="visLightsEnableCommand" />
+        <Variable Name="visLightsFlashColor" />
+        <Variable Name="visLightsReset" />
+        <Variable Name="visLightsTrigger" />
+        <Variable Name="visSensorEnableCommand" />
+        <Variable Name="visSensorFlashColor" />
+        <Variable Name="visEnableLightBarValues" />
+        <Variable Name="visAutoArchiv" />
+        <Variable Name="Pixel" AutomaticEnable="True">
+          <Variable Name="ModelNumber" EnableArrayElements="True" />
+          <Variable Name="NumPixels" EnableArrayElements="True" />
+          <Variable Name="MinGray" EnableArrayElements="True" />
+          <Variable Name="MaxGray" EnableArrayElements="True" />
+          <Variable Name="MeanGray" EnableArrayElements="True" />
+          <Variable Name="DeviationGray" EnableArrayElements="True" />
+          <Variable Name="MedianGray" EnableArrayElements="True" />
+          <Variable Name="ModelArea" EnableArrayElements="True" />
+          <Variable Name="NumConnectedComponents" EnableArrayElements="True" />
+          <Variable Name="PositionX" EnableArrayElements="True" />
+          <Variable Name="PositionY" EnableArrayElements="True" />
+        </Variable>
       </Task>
     </Module>
   </DefaultView>

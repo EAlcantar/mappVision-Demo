@@ -48,7 +48,7 @@ SvgTexts.ContentBeginJS :=
 			var blueCrosshairs, redCrosshair, indices, infoTxt;
 			var amountElements;
 			var actIndex = 1;
-			var textInfo = ["Module ID: ", "Pos X: ", "Pos Y: ", "Orientation: ", "Clipped: ", "Gray: ", "Length: ", "Width: ", "Area: ", "Score: ", "Scale: ", "Grading: ", "Text: ", "Code Type: ", "Result: "];
+			var textInfo = ["Model ID: ", "Pos X: ", "Pos Y: ", "Orientation: ", "Clipped: ", "Gray: ", "Length: ", "Width: ", "Area: ", "Score: ", "Scale: ", "Grading: ", "Code Type: ", "Text: ", "Result: "];
 			var visTextInfo = [';
 SvgTexts.ContentBetween1 :=
 '];
@@ -125,7 +125,7 @@ SvgTexts.ContentCrossHairBegin :=
 SvgTexts.ContentCrossHairMiddle :=
 ')" transform="translate(';
 SvgTexts.ContentCrossHairEnd :=
-'/>
+')"/>
 ';
 SvgTexts.ContentCrossHairRed :=
 '
@@ -167,7 +167,7 @@ SvgTexts.ContentEnd :=
 </svg>';
 END_ACTION
 ACTION ACTION_CreateHtmlFile:
-HtmlFileContent :=
+HtmlFileContent1 :=
 '<!DOCTYPE html>
 <html lang="de">
 	<head>
@@ -178,19 +178,15 @@ HtmlFileContent :=
 			html, body{
 				height: 100%;
 				width: 100%;
-				font: 14px Arial;
-				color: white;
-				background: #444;
+				background: #C0C0C0;
 				margin: 0;
 				padding: 0;
 			}
 			img {
 				width: 100%;
-				display: block;
+				height: auto;
 				margin-left: auto;
 				margin-right: auto;
-				content-fit: contain;
-				content-position: 50% 50%;
 			}
 			div {
 				height: 100%;
@@ -211,13 +207,42 @@ HtmlFileContent :=
 					if (!results[2]) return "";
 					return decodeURIComponent(results[2].replace(/\+/g, " "));
 				}
-				var ImagePath 			= "http://192.168.200." + getParameterByName("node") + ":8080/jpg";
+				var ImagePath 			= "http://';
+HtmlFileContent2 :=
+':8888/jpg";
 				var ErrorImagePath 		= "VisionEye.png";
 				var UpdateInterval_ms 	= 200;
 				var MissingImgCtr		= 0;
 				function updateImage() {
 					document.getElementById("imgCamera").setAttribute("src", ImagePath + "?q=" + getParameterByName("q") + "&" + Math.random());
 					var img = document.getElementById("imgCamera");
+					var rot = getParameterByName("rot");
+					var scale = getParameterByName("scale");
+					if (scale == 0){
+						scale = 1;
+					}
+					switch (rot) {
+						case "0":
+							move_x = 0;
+							move_y = 0;
+							break;
+						case "90":
+							move_x = img.height;
+							move_y = 0;
+							break;
+						case "180":
+							move_x = img.width;
+							move_y = img.height;
+							break;
+						case "270":
+							move_x = 0;
+							move_y = img.width;
+							break;
+						default: //same as 0
+							move_x = 0;
+							move_y = 0;
+					}
+					document.getElementById("imgCamera").setAttribute("style", "transform-origin: 0% 0%; transform: scale(" + scale + ") translate(" + move_x + "px," + move_y + "px) rotate(" + rot + "deg);");
 					if(img.naturalHeight !== 0 ) {
 						MissingImgCtr = 0;
 						showCameraImage() ;
@@ -245,6 +270,22 @@ HtmlFileContent :=
 				}
 			</script>
 		</div>
+	</body>
+</html>';
+END_ACTION
+ACTION CreateVC4HTML:
+VC4HTML[0] := '<!DOCTYPE html>
+<html lang="de">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Camera Picture</title>		
+	</head>
+	<body >
+		<img id="imgError" width="';
+VC4HTML[1] := 'px" height="';
+VC4HTML[2] := 'px" src="';
+VC4HTML[3] := '" />
 	</body>
 </html>';
 END_ACTION

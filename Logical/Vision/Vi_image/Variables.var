@@ -9,20 +9,31 @@ VAR
 	tmpStr : STRING[80];
 END_VAR
 (**)
-(*Filehandling*)
+(*Proxy variables*)
+VAR
+	nodeSTR : STRING[80];
+	ipSTR : STRING[80];
+	TcpForward_0 : TcpForward;
+END_VAR
+(**)
 VAR
 	DirCreate_0 : DirCreate;
+END_VAR
+(*Filehandling*)
+VAR
 	DirDeleteEx_0 : DirDeleteEx;
 	FileDelete_0 : FileDelete;
 END_VAR
 (**)
 (*Internal FBKs*)
 VAR
+	CfgGetIPAddr_0 : CfgGetIPAddr;
 	ViDownloadImage_0 : ViDownloadImage;
 	ViSaveImgOnPlc_0 : ViSaveImgOnPlc;
 	ViRefreshImageList_0 : ViRefreshImageList;
 	ViDrawCrosshair_0 : ViDrawCrosshair;
 	ViCreateWebDirFile_0 : ViCreateWebDirFile;
+	ViShowImgOnVC4_0 : ViShowImgOnVC4;
 END_VAR
 (**)
 (*mappView connected variables*)
@@ -37,13 +48,9 @@ VAR
 	visImageList : ARRAY[0..19] OF STRING[80];
 	visWebViewerPath : STRING[80];
 	visWebViewerQuery : STRING[80];
-END_VAR
-(**)
-(*Memory handling*)
-VAR
-	AsMemPartCreate_0 : AsMemPartCreate;
-	AsMemPartAllocClear_0 : AsMemPartAllocClear;
-	MemInfo : MemInfo_Type;
+	visVC4RefreshImg : BOOL;
+	visImageRotation : USINT;
+	visTextAlignment : BOOL;
 END_VAR
 (**)
 (*Constants*)
@@ -52,4 +59,6 @@ VAR CONSTANT
 	ERR_BUFF_TOO_SMALL : UINT := 50220;
 	ERR_TIMEOUT_DOWNLOAD : UINT := 50320; (*Download response timed out*)
 	ERR_MEM_DOWNLOAD : UINT := 50310; (*Size of download file exceeds maximum*)
+	ERR_MEM_BMP_TOO_SMALL : UINT := 50410;
+	ERR_WRONG_DATA : UINT := 50420;
 END_VAR

@@ -6,6 +6,7 @@
 		<Page refId="pageResult" />
 		<Page refId="pageLights" />
 		<Page refId="pageNettime" />
+		<Page refId="pageColor" />
 		<Page refId="RecipePage" />
 		<Page refId="pageImageArchiv" />
 	</Pages>
@@ -21,7 +22,9 @@
 		<BindingsSet refId="Match_binding" />
 		<BindingsSet refId="OCR_binding" />
 		<BindingsSet refId="MT_binding" />
+		<BindingsSet refId="Pixel_binding" />
 		<BindingsSet refId="Nettime_binding" />
+		<BindingsSet refId="Color_binding" />
 		<BindingsSet refId="Lights_binding" />
 		<BindingsSet refId="Recipe_binding" />
 		<BindingsSet refId="ImageArchiv_binding" />
@@ -31,6 +34,8 @@
 		<EventBindingsSet refId="Footer_eventbinding" />
 		<EventBindingsSet refId="Navigation_eventbinding" />
 		<EventBindingsSet refId="Main_eventbinding" />
+		<EventBindingsSet refId="Results_eventbinding" />
+		<EventBindingsSet refId="Color_eventbinding" />
 		<EventBindingsSet refId="Lights_eventbinding" />
 		<EventBindingsSet refId="Recipe_eventbinding" />
 		<EventBindingsSet refId="ImageArchiv_eventbinding" />
@@ -40,11 +45,12 @@
 	</Dialogs>
 	<Contents preCache="all">
 		<Content refId="contentResult" />
-		<Content refId="contentBlob" />
-		<Content refId="contentMatch" />
-		<Content refId="contentMT" />
-		<Content refId="contentOCR" />
-		<Content refId="contentCodeReader" />
+		<Content refId="contentBlob" preCache="false"/>
+		<Content refId="contentMatch" preCache="false"/>
+		<Content refId="contentMT" preCache="false"/>
+		<Content refId="contentOCR" preCache="false"/>
+		<Content refId="contentCodeReader" preCache="false"/>
+		<Content refId="contentPixel" preCache="false"/>
 	</Contents>
 	<SnippetsSets>
 		<!--<SnippetsSet refId=""/>-->
@@ -63,6 +69,8 @@
 		<Configuration key="activityCount" value="false" />
 		<Configuration key="zoom" value="true" />
 		<Configuration key="bootProgressBar" value="true" />
+		<Configuration key="bootLogo" value="Media/VisionEye.png" />
+		<Configuration key="bootColor" value="#000000" />
 		<Gestures>
 			<!--<SystemGesture1 touchPoints="2" />
 			<SystemGesture2 touchPoints="2" />

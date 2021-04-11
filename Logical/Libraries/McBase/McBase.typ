@@ -36,6 +36,20 @@ TYPE
 		mcBLENDING_HIGH	(*The velocity is blended with highest velocity of both FBs*)
 	);
 
+	McBrakeCmdEnum :
+	(
+		mcBRAKE_CLOSE,					 (*Engages the brake*)
+		mcBRAKE_OPEN,					 (*Releases the brake*)
+		mcBRAKE_GET_STATUS				 (*Reads out the current brake status*)
+	);
+
+	McBrakeStatusEnum :
+	(
+		mcBRAKE_STATUS_NOT_PROVIDED,	 (*Commands was not *)
+		mcBRAKE_CLOSED,					 (*Holding brake engaged*)
+		mcBRAKE_OPENED					 (*Holding brake released*)
+	);
+
 	McHomingModeEnum :
 	(
 		mcHOMING_DIRECT := 0,			 (*Direct homing. "Position" is used directly as the new axis position*)
@@ -51,6 +65,12 @@ TYPE
 		mcHOMING_DEFAULT := 140,		 (*All parameters, including "Position", are taken from the initial configuration for the axis*)
 		mcHOMING_INIT,					 (*All parameters, including "Position", are taken from an earlier initialization made using function block MC_BR_InitHome*)
 		mcHOMING_RESTORE_POSITION		 (*Restores position from permanent memory*)
+	);
+
+	McStopModeEnum :
+	(
+		mcSTOPMODE_JERK_LIMIT,			 (*Takes into account the jerk limit value while stopping*)
+		mcSTOPMODE_NO_JERK_LIMIT		 (*Ignores the jerk limit value while stopping*)
 	);
 
 	McIplModeEnum :
@@ -75,8 +95,9 @@ TYPE
 
 	McEdgeEnum :
 	(
-		mcEDGE_POSITIVE,				 (*Selection for the rising edge*)
-		mcEDGE_NEGATIVE					 (*Selection for the falling edge*)
+		mcEDGE_POSITIVE, (*Selection for the rising edge*)
+		mcEDGE_NEGATIVE, (*Selection for the falling edge*)
+		mcEDGE_MIDDLE (* Middle position between positive and negative edge*)
 	);
 
 	McNetworkTypeEnum :
@@ -105,9 +126,10 @@ TYPE
 		mcSCS4 := 6,	 (*System coordinate system 4*)
 		mcSCS5 := 7,	 (*System coordinate system 5*)
 		mcTCS := 9,	 (*Tool coordinate system*)
+		mcGCS := 10,	 (*Global coordinate system*)
 		mcJACS := 100	 (*Joint axes coordinate system*)
 	);
-	
+
 	McValueSrcEnum :
 	(
 		mcVALUE_SET, 					 (*Position setpoint value [Measurement units]*)
@@ -210,12 +232,20 @@ TYPE
 	McInternalMappLinkType : 	STRUCT  (*internal variable*)
 		Internal : ARRAY[0..1]OF UDINT; (*Internal data*)
 	END_STRUCT;
+	
+	McInternalMotionCfgIfType : 	STRUCT  (*Partial interface type (C only)*)
+		vtable : DWORD; (**)
+	END_STRUCT;
 
 	McInternalAxisIfType : 	STRUCT  (*Partial interface type (C only)*)
 		vtable : DWORD; (**)
 	END_STRUCT;
 
 	McInternalAxesGroupIfType : 	STRUCT  (*Partial interface type (C only)*)
+		vtable : DWORD; (**)
+	END_STRUCT;
+
+	McInternalTrackingPathIfType : 	STRUCT  (*Partial interface type (C only)*)
 		vtable : DWORD; (**)
 	END_STRUCT;
 
@@ -227,6 +257,10 @@ TYPE
 	END_STRUCT;
 
 	(*Component References*)
+	McMotionCfgType : 	STRUCT
+		controlif : REFERENCE TO McInternalMotionCfgIfType; (**)
+		mappLinkInternal : McInternalMappLinkType; (**)
+	END_STRUCT;
 
 	McAxisType : 	STRUCT
 		controlif : REFERENCE TO McInternalAxisIfType; (**)
@@ -234,10 +268,19 @@ TYPE
 		seqNo : DINT; (**)
 	END_STRUCT;
 
-	McPsmAxisType :McAxisType; (**)
+	McPsmAxisType : McAxisType; (**)
+
+	McApsmAxisType : McAxisType; (**)
+
+	McConvoyType : McAxisType; (**)
 
 	McAxesGroupType : 	STRUCT
 		controlif : REFERENCE TO McInternalAxesGroupIfType; (**)
+		mappLinkInternal : McInternalMappLinkType; (**)
+	END_STRUCT;
+
+	McTrackingPathType : 	STRUCT
+		controlif : REFERENCE TO McInternalTrackingPathIfType; (**)
 		mappLinkInternal : McInternalMappLinkType; (**)
 	END_STRUCT;
 

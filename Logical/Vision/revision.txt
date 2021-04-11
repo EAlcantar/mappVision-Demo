@@ -1,7 +1,31 @@
-Version 2.2 (development)
+Next Version
+- Update recipe managment to V1.0
+- Updated constant for code reader parameter "ParameterMode"
+- Fix ViColor
+- Make it possible to change connections
+- Updated to official 5.13 versions and official lightbar upgrade
+
+Version 2.3
+ - Added RouteInfo_Tool.ps1
+ - Added color detection first version
+ - Split up main task into main and visu, integrated light task into main and visu
+ - Added funkctionality to rotate the image on the main page
+ - Click on the image on the main page toggles now the textposition (crosshair-details) from left to right
+ - CodeReader and OCR Text will be shown on the main page and saved in SVG file
+ - Added proxy task to eliminate routing batch file
+ - Added Pixel Counter hardware and code
+
+Version 2.2
 - Added new functionality to show images in every size on the webviewer widget on the mainpage
 - Improved repetitive mode
 - SVG files save now all information. It is possible to click on the crosshairs to show the details
+- Added diagnostic data creation
+- Updated recipe management
+- Changed public arrays start index to 0 to avoid issues with C task
+- Added a VC4 visualization
+- Added functionality to show the image on the VC4 visualization (documentation still missing)
+- After boot the first found light will be selected
+- Some additional improvements, code optimizations & bug fixes
 
 Version 2.1
 - Simplified and reduced data structures

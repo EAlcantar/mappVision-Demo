@@ -5,8 +5,6 @@ FUNCTION_BLOCK ViDownloadImage (* *) (*$GROUP=User,$CAT=User,$GROUPICON=User.png
 		FileDevice : STRING[80];
 		FileName : STRING[80];
 		ImgName : STRING[80];
-		MemSvgAdr : UDINT;
-		MemSvgSize : UDINT;
 		visDownloadFileUrl : REFERENCE TO STRING[200];
 	END_VAR
 	VAR_OUTPUT
@@ -14,6 +12,10 @@ FUNCTION_BLOCK ViDownloadImage (* *) (*$GROUP=User,$CAT=User,$GROUPICON=User.png
 	END_VAR
 	VAR
 		Step : INT;
+		AsMemPartCreate_0 : AsMemPartCreate;
+		AsMemPartAllocClear_0 : AsMemPartAllocClear;
+		MemSvgAdr : UDINT;
+		MemSvgSize : UDINT;
 		FileOpen_0 : FileOpen;
 		FileRead_0 : FileRead;
 		FileClose_0 : FileClose;
@@ -27,7 +29,7 @@ END_FUNCTION_BLOCK
 FUNCTION_BLOCK ViRefreshImageList
 	VAR_INPUT
 		Enable : BOOL;
-		CFG : typVisionImageConfig;
+		VisionImage : REFERENCE TO typVisionImage;
 		ImageList : REFERENCE TO ARRAY[0..19] OF STRING[80];
 		visSelectedImage : REFERENCE TO STRING[80];
 	END_VAR
@@ -57,7 +59,6 @@ FUNCTION_BLOCK ViSaveImgOnPlc
 		Enable : BOOL;
 		CFG : typVisionImageConfig;
 		PowerlinkNode : USINT;
-		MemInfo : MemInfo_Type;
 		CrossHairInfo : REFERENCE TO ARRAY[0..MAX_NUM_RESULTS] OF typCrossHairInfo;
 	END_VAR
 	VAR_OUTPUT
@@ -65,6 +66,9 @@ FUNCTION_BLOCK ViSaveImgOnPlc
 	END_VAR
 	VAR
 		Step : INT;
+		AsMemPartCreate_0 : AsMemPartCreate;
+		AsMemPartAllocClear_0 : AsMemPartAllocClear;
+		MemInfo : MemInfoSave_Type;
 		DiagStartTime : TIME;
 		DiagTime : DiagTime_Type;
 		DTGetTime_0 : DTGetTime;
@@ -104,6 +108,8 @@ FUNCTION_BLOCK ViDrawCrosshair
 		VisionSensor : REFERENCE TO typVisionMain;
 		CodeTypes : REFERENCE TO ARRAY[0..MAX_NUM_CODETYPES] OF STRING[80];
 		VisionDisabled : BOOL;
+		TextAlignment : BOOL; (*0: left, 1: right*)
+		ImageRotation_deg : UINT;
 		visCrossHair : REFERENCE TO typCrossHair;
 	END_VAR
 	VAR_OUTPUT
@@ -113,16 +119,21 @@ FUNCTION_BLOCK ViDrawCrosshair
 		idx : UINT;
 		SelectedSensorOld : UINT;
 		Blob : REFERENCE TO typBlobMain;
-		Match : REFERENCE TO typMatchMain;
 		CodeReader : REFERENCE TO typCodeReaderMain;
-		OCR : REFERENCE TO typOCRMain;
+		Match : REFERENCE TO typMatchMain;
 		MT : REFERENCE TO typMTMain;
+		Pixel : REFERENCE TO typPixelMain;
+		OCR : REFERENCE TO typOCRMain;
 		DetailsNoOld : USINT;
 		ShowCrosshairOld : BOOL;
-		CrosshairModelNumber : USINT;
-		CrosshairPositionX : REAL;
-		CrosshairPositionY : REAL;
-		CrosshairOrientation : INT;
+		ImageRotation_degOld : UINT;
+		TextAlignmentOld : BOOL;
+		ResultModelNumber : USINT;
+		ResultPositionX : REAL;
+		ResultPositionY : REAL;
+		ResultOrientation : REAL;
+		CrosshSize : REAL;
+		ScaleVertical : REAL;
 		svgTrafo : STRING[200];
 		svgContent : STRING[1000];
 		tmpStr : STRING[100];
@@ -136,6 +147,7 @@ FUNCTION_BLOCK ViCreateWebDirFile
 		Enable : BOOL;
 		FileDevUser : STRING[80];
 		EthDevice : STRING[80];
+		EthIP : STRING[80];
 		visWebViewerPath : REFERENCE TO STRING[80];
 	END_VAR
 	VAR_OUTPUT
@@ -146,6 +158,7 @@ FUNCTION_BLOCK ViCreateWebDirFile
 		Step : INT;
 		DirInfo_0 : DirInfo;
 		DirCreate_0 : DirCreate;
+		FileDelete_0 : FileDelete;
 		FileCreate_0 : FileCreate;
 		FileWrite_0 : FileWrite;
 		FileClose_0 : FileClose;
@@ -160,17 +173,78 @@ FUNCTION_BLOCK ViCreateWebDirFile
 		FileNameEyeSystem : STRING[80];
 		FileNameEyeUser : STRING[80];
 		EthIpAddr : STRING[80];
-		HtmlFileContent : STRING[3000];
+		HtmlFileContent1 : STRING[1500];
+		HtmlFileContent2 : STRING[2000];
+		FileWriteData : STRING[3600];
 	END_VAR
 END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK ViShowImgOnVC4
+	VAR_INPUT
+		Enable : BOOL;
+		RefreshImage : BOOL;
+		CFG : typVisionImageConfig;
+		PowerlinkNode : USINT;
+		ImgWidthInVC4_px : UINT;
+	END_VAR
+	VAR_OUTPUT
+		Status : UINT;
+		HTMLStreamContent : STRING[600];
+		RefreshDone : BOOL;
+	END_VAR
+	VAR
+		Step : INT;
+		AsMemPartCreate_0 : AsMemPartCreate;
+		AsMemPartAllocClear_0 : AsMemPartAllocClear;
+		MemInfo : MemInfoVC4_Type;
+		FileNameBmp24Bit : STRING[80];
+		FileNameBmp24BitDir : STRING[80];
+		URI : STRING[80];
+		Host : STRING[80];
+		ImgHeight_px : UINT;
+		httpClient_0 : httpClient;
+		httpClientErrorStatus : UINT;
+		RequestHeader : httpRequestHeader_t;
+		TON_Timeout : TON;
+		FileSizeIn8Bit : UDINT;
+		FileDelete_0 : FileDelete;
+		FileCreate_0 : FileCreate;
+		FileWrite_0 : FileWrite;
+		FileClose_0 : FileClose;
+		Bmp8Bit : Bmp8Bit_Type;
+		Bmp24Bit : Bmp24Bit_Type;
+		BytesPerLine : DINT;
+		PixelSourceAdr : UDINT;
+		PixelDestAdr : UDINT;
+		PixelSourceColor : REFERENCE TO USINT;
+		PixelDestColor : REFERENCE TO PixelDestColor_Type;
+		BytesRemaining : DINT;
+		VC4HTML : ARRAY[0..3] OF STRING[300];
+		tmpStr1 : STRING[30];
+		i : UDINT;
+	END_VAR
+END_FUNCTION_BLOCK
+
+FUNCTION CrosshairDetailsValue : BOOL
+	VAR_INPUT
+		strTarget : UDINT;
+		strText : UDINT;
+		fValue : REAL;
+		TextAlignment : BOOL;
+	END_VAR
+	VAR
+		tmpStr : STRING[80];
+	END_VAR
+END_FUNCTION
 
 FUNCTION CrosshairDetailsText : BOOL
 	VAR_INPUT
 		strTarget : UDINT;
 		strText : UDINT;
-		fValue : REAL;
+		adrText : UDINT;
+		TextAlignment : BOOL;
 	END_VAR
 	VAR
-		tmpStr : STRING[50];
+		tmpStr : STRING[80];
 	END_VAR
 END_FUNCTION

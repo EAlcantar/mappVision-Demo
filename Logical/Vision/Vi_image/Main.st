@@ -4,54 +4,38 @@
 // - Download of the image in the browser
 // - Creates a html file to "resize" thei image for the mappview visualization (every size of the picuture matches the visu size)
 // - Draw crosshairs
-// Version 2.1
+// Version 2.2
 // --------------------------------------------------------------------------------------------------------------------
 PROGRAM _INIT
 	IF RemCfgImage.ConvertCycles = 0 THEN 							// Invalid --> use default values
-		gVisionImage.CFG.FileDevice 	:= 'VisionFileDevice';		// File device name where the images are stored
-		gVisionImage.CFG.DirName		:= 'Vision';				// Directory used for images
-		gVisionImage.CFG.CameraIP		:= '192.168.200.';			// IP adress of the camera (see PLK settings)
-		gVisionImage.CFG.EthDevice		:= 'IF2';					// Device path of the PLCs ETH address
-		gVisionImage.CFG.ConvertCycles	:= 10000;					// Conversioncycles per step (TK8 call). Use higer value on high performance CPU, use lower values on low performance CPU or in case of cycle time violations
-		gVisionImage.CFG.Format			:= 0;						// Image type, use 0 for JPEG, 1 for bitmap
-		gVisionImage.CFG.QualityJPG		:= 80;						// Quality for JPG images, larger numbers produce better images. Allowed values: 0 to 100, but values < ca 10 makes no sense
-		gVisionImage.CFG.UploadBmpJpg	:= TRUE;
-		gVisionImage.CFG.UploadSVG		:= TRUE;
+		gVisionImage.CFG.FileDevice 		:= DEVICE_NAME;				// File device name where the images are stored
+		gVisionImage.CFG.DirName			:= 'Vision';				// Directory used for images
+		gVisionImage.CFG.PlkIPWithoutNode	:= '192.168.200.';			// IP adress of the plk interface, where the camera is connected to (see PLK settings), without the node (last part). Example: "192.168.200.0"
+		gVisionImage.CFG.EthDevice			:= 'IF2';					// Device path of the PLCs ETH address
+		gVisionImage.CFG.ConvertCycles		:= 10000;					// Conversioncycles per step (TK8 call). Use higer value on high performance CPU, use lower values on low performance CPU or in case of cycle time violations
+		gVisionImage.CFG.Format				:= 0;						// Image type, use 0 for JPEG, 1 for bitmap
+		gVisionImage.CFG.QualityJPG			:= 80;						// Quality for JPG images, larger numbers produce better images. Allowed values: 0 to 100, but values < ca 10 makes no sense
+		gVisionImage.CFG.UploadBmpJpg		:= TRUE;
+		gVisionImage.CFG.UploadSVG			:= TRUE;
+		gVisionImage.CFG.ImageRotation_deg	:= 0;
+		gVisionImage.CFG.MainPageQualityJPG	:= 30;
 	ELSE
 		brsmemcpy(ADR(gVisionImage.CFG), ADR(RemCfgImage), SIZEOF(RemCfgImage)); // Restore default values from remanent memory
 	END_IF
 	gVisionImage.CMD.CreateDir	:= TRUE;
 	visSelectedImage			:= '';
-
-	// Create memory for uploading and transforming image
-	// Size: a 5MP picture in bmp format has less than 6.000.000 Bytes. A SVG with bas64 conversion maximum the 4/3 size.
-	MemInfo.UploadSize		:= 6000000;		// Upload of the picture data with httpClient
-	MemInfo.SvgHeaderSize	:= 2000; 		// Fileheader, ...
-	MemInfo.CrosshSize		:= 18000; 		// Crosshairs, Texts, ...
-	MemInfo.SvgSize			:= MemInfo.UploadSize * 4 / 3 + MemInfo.SvgHeaderSize + MemInfo.CrosshSize;
-	AsMemPartCreate_0.enable	:= TRUE;
-	AsMemPartCreate_0.len		:= MemInfo.UploadSize + MemInfo.SvgSize + MemInfo.CrosshSize + 1000; // 1000 Bytes for AsMemPart stuff/header
-	AsMemPartCreate_0();
-	IF AsMemPartCreate_0.status = 0 THEN
-		// Upload mem for loading the image from camera to plc
-		AsMemPartAllocClear_0.len		:= MemInfo.UploadSize;
-		AsMemPartAllocClear_0(enable := TRUE, ident := AsMemPartCreate_0.ident);
-		IF AsMemPartAllocClear_0.status = 0 THEN
-			MemInfo.UploadAdr			:= AsMemPartAllocClear_0.mem;
-		END_IF
-		// Svg mem for creating the svg file including the image
-		AsMemPartAllocClear_0.len		:= MemInfo.SvgSize;
-		AsMemPartAllocClear_0(enable := TRUE, ident := AsMemPartCreate_0.ident);
-		IF AsMemPartAllocClear_0.status = 0 THEN
-			MemInfo.SvgAdr 				:= AsMemPartAllocClear_0.mem;
-		END_IF
-		// Mem for creating the crosshaurs
-		AsMemPartAllocClear_0.len		:= MemInfo.CrosshSize;
-		AsMemPartAllocClear_0(enable := TRUE, ident := AsMemPartCreate_0.ident);
-		IF AsMemPartAllocClear_0.status = 0 THEN
-			MemInfo.CrosshAdr			:= AsMemPartAllocClear_0.mem;
-		END_IF
-	END_IF
+	// Call FBKs which interanally alloc memory once in the INIT
+	ViDownloadImage_0();
+	ViSaveImgOnPlc_0();
+	// Get IP address
+	CfgGetIPAddr_0.enable		:= TRUE;
+	CfgGetIPAddr_0.Len			:= SIZEOF(gVisionImage.CFG.EthIP);
+	CfgGetIPAddr_0.pDevice		:= ADR(gVisionImage.CFG.EthDevice);
+	CfgGetIPAddr_0.pIPAddr		:= ADR(gVisionImage.CFG.EthIP);
+	CfgGetIPAddr_0();
+	// Proxy server settings
+	TcpForward_0.ServerPort := 8888;
+	TcpForward_0.ConnectToPort := 8080 ; 			
 END_PROGRAM
 PROGRAM _CYCLIC
 	CASE Step OF
@@ -123,7 +107,7 @@ PROGRAM _CYCLIC
 			DirCreate_0.pDevice		:= ADR(gVisionImage.CFG.FileDevice);
 			DirCreate_0.pName		:= ADR(gVisionImage.CFG.DirName);
 			DirCreate_0();
-			IF DirCreate_0.status = 0 OR DirCreate_0.status = fiERR_DIR_ALREADY_EXIST THEN
+			IF DirCreate_0.status = ERR_OK OR DirCreate_0.status = fiERR_DIR_ALREADY_EXIST THEN
 				Step := VISTEP_REFRESH_IMG_LIST;
 			ELSIF DirCreate_0.status <> ERR_FUB_BUSY THEN
 				gVisionImage.DAT.Status := DirCreate_0.status;
@@ -135,7 +119,7 @@ PROGRAM _CYCLIC
 			DirDeleteEx_0.pDevice	:= ADR(gVisionImage.CFG.FileDevice);
 			DirDeleteEx_0.pName		:= ADR(gVisionImage.CFG.DirName);
 			DirDeleteEx_0();
-			IF DirDeleteEx_0.status = 0 THEN
+			IF DirDeleteEx_0.status = ERR_OK THEN
 				Step := VISTEP_CREATE_DIR;
 			ELSIF DirDeleteEx_0.status <> ERR_FUB_BUSY THEN
 				gVisionImage.DAT.Status := DirDeleteEx_0.status;
@@ -147,7 +131,7 @@ PROGRAM _CYCLIC
 			FileDelete_0.pDevice	:= ADR(gVisionImage.CFG.FileDevice);
 			FileDelete_0.pName 		:= ADR(FileNameComplete);
 			FileDelete_0();
-			IF FileDelete_0.status = 0 THEN
+			IF FileDelete_0.status = ERR_OK THEN
 				Step := VISTEP_REFRESH_IMG_LIST;
 			ELSIF FileDelete_0.status <> ERR_FUB_BUSY THEN
 				gVisionImage.DAT.Status := FileDelete_0.status;
@@ -156,11 +140,11 @@ PROGRAM _CYCLIC
 
 		VISTEP_REFRESH_IMG_LIST: // Refresh image list from the image directory on the user partition
 			ViRefreshImageList_0.Enable				:= TRUE;
-			ViRefreshImageList_0.CFG				:= gVisionImage.CFG;
+			ViRefreshImageList_0.VisionImage		:= ADR(gVisionImage);
 			ViRefreshImageList_0.ImageList			:= ADR(visImageList);
 			ViRefreshImageList_0.visSelectedImage	:= ADR(visSelectedImage);
 			ViRefreshImageList_0();
-			IF ViRefreshImageList_0.Status = 0 THEN
+			IF ViRefreshImageList_0.Status = ERR_OK THEN
 				gVisionImage.DAT.Status := 0;
 				Step := VISTEP_WAIT;
 			ELSIF ViRefreshImageList_0.Status <> ERR_FUB_BUSY THEN
@@ -173,11 +157,9 @@ PROGRAM _CYCLIC
 			ViDownloadImage_0.FileDevice			:= gVisionImage.CFG.FileDevice;
 			ViDownloadImage_0.FileName				:= FileNameComplete;
 			ViDownloadImage_0.ImgName				:= visSelectedImage;
-			ViDownloadImage_0.MemSvgAdr				:= MemInfo.SvgAdr;
-			ViDownloadImage_0.MemSvgSize			:= MemInfo.SvgSize;
 			ViDownloadImage_0.visDownloadFileUrl	:= ADR(visDownloadFileUrl);
 			ViDownloadImage_0();
-			IF ViDownloadImage_0.Status = 0 THEN
+			IF ViDownloadImage_0.Status = ERR_OK THEN
 				gVisionImage.DAT.Status := 0;
 				Step := VISTEP_WAIT;
 			ELSIF ViDownloadImage_0.Status <> ERR_FUB_BUSY THEN
@@ -189,10 +171,9 @@ PROGRAM _CYCLIC
 			ViSaveImgOnPlc_0.Enable				:= TRUE;
 			ViSaveImgOnPlc_0.CFG				:= gVisionImage.CFG;
 			ViSaveImgOnPlc_0.PowerlinkNode		:= gVisionSensor[LIMIT(1, visSelectedSensor, MAX_NUM_CAMS)].CFG.PowerlinkNode;
-			ViSaveImgOnPlc_0.MemInfo			:= MemInfo;
 			ViSaveImgOnPlc_0.CrossHairInfo		:= ADR(ViDrawCrosshair_0.CrossHairInfo);
 			ViSaveImgOnPlc_0();
-			IF ViSaveImgOnPlc_0.Status = 0 THEN
+			IF ViSaveImgOnPlc_0.Status = ERR_OK THEN
 				Step := VISTEP_REFRESH_IMG_LIST;
 			ELSIF ViSaveImgOnPlc_0.Status <> ERR_FUB_BUSY THEN
 				gVisionImage.DAT.Status := ViSaveImgOnPlc_0.Status;
@@ -207,6 +188,18 @@ PROGRAM _CYCLIC
 			END_IF
 			brsmemset(ADR(gVisionImage.CMD), 0, SIZEOF(gVisionImage.CMD));
 	END_CASE
+	
+	// Proxy server cyclic call ( Only needed for information. ) 
+	ipSTR := gVisionImage.CFG.PlkIPWithoutNode;
+	brsitoa(visSelectedSensor, ADR(nodeSTR));
+	brsstrcat(ADR(ipSTR), ADR(nodeSTR));
+	IF brsstrcmp( ADR( TcpForward_0.ConnectToIp ),ADR( ipSTR )) <> 0 THEN
+		TcpForward_0.ConnectToIp := ipSTR ;
+		TcpForward_0.Enable := FALSE ;	
+	ELSE
+		TcpForward_0.Enable := gVisionSensor[visSelectedSensor].HW.Connected ; // Only enable if its connected
+	END_IF
+	TcpForward_0();
 
 	// Draw the crosshairs on the mainpage
 	ViDrawCrosshair_0.SelectedSensor		:= visSelectedSensor;
@@ -214,6 +207,8 @@ PROGRAM _CYCLIC
 	ViDrawCrosshair_0.VisionSensor			:= ADR(gVisionSensor[visSelectedSensor]);
 	ViDrawCrosshair_0.CodeTypes				:= ADR(CodeTypes);
 	ViDrawCrosshair_0.VisionDisabled		:= gVisionImage.DAT.VisionDisabled;
+	ViDrawCrosshair_0.ImageRotation_deg		:= gVisionImage.CFG.ImageRotation_deg;
+	ViDrawCrosshair_0.TextAlignment			:= visTextAlignment;
 	ViDrawCrosshair_0.visCrossHair			:= ADR(visCrossHair);
 	ViDrawCrosshair_0();
 	gVisionImage.CMD.RefreshCrosshair		:= FALSE;
@@ -223,12 +218,55 @@ PROGRAM _CYCLIC
 		ViCreateWebDirFile_0.Enable				:= TRUE;
 		ViCreateWebDirFile_0.FileDevUser		:= gVisionImage.CFG.FileDevice;
 		ViCreateWebDirFile_0.EthDevice			:= gVisionImage.CFG.EthDevice;
+		ViCreateWebDirFile_0.EthIP				:= gVisionImage.CFG.EthIP;
 		ViCreateWebDirFile_0.visWebViewerPath	:= ADR(visWebViewerPath);
 		ViCreateWebDirFile_0();
 	END_IF
-	visWebViewerQuery := 'jpg?q=30&node=';
-	brsitoa(gVisionSensor[visSelectedSensor].CFG.PowerlinkNode, ADR(tmpStr));
+	visWebViewerQuery := 'q=';
+	brsitoa(gVisionImage.CFG.MainPageQualityJPG, ADR(tmpStr));
+	brsstrcat(ADR(visWebViewerQuery), ADR(tmpStr));
+	brsstrcat(ADR(visWebViewerQuery), ADR('&rot='));
+	brsitoa(gVisionImage.CFG.ImageRotation_deg, ADR(tmpStr));
+	brsstrcat(ADR(visWebViewerQuery), ADR(tmpStr));
+	brsstrcat(ADR(visWebViewerQuery), ADR('&scale='));
+	CASE gVisionImage.CFG.ImageRotation_deg OF
+		0:		brsftoa(1.0, ADR(tmpStr));
+		90:		brsftoa(UINT_TO_REAL(gVisionSensor[visSelectedSensor].CFG.ResolutionHeight_Y) / UINT_TO_REAL(gVisionSensor[visSelectedSensor].CFG.ResolutionWidth_X), ADR(tmpStr));
+		180:	brsftoa(1.0, ADR(tmpStr));
+		270:	brsftoa(UINT_TO_REAL(gVisionSensor[visSelectedSensor].CFG.ResolutionHeight_Y) / UINT_TO_REAL(gVisionSensor[visSelectedSensor].CFG.ResolutionWidth_X), ADR(tmpStr));
+	ELSE
+		brsftoa(1.0, ADR(tmpStr));
+	END_CASE
 	brsstrcat(ADR(visWebViewerQuery), ADR(tmpStr));
 	
+	// Main page image rotation
+	gVisionImage.CFG.ImageRotation_deg := visImageRotation * 90;
+	
+	// Show camera image on VC4 visualization
+	ViShowImgOnVC4_0.Enable				:= ViCreateWebDirFile_0.Done; // Wait until the directory "web" is created
+	ViShowImgOnVC4_0.RefreshImage		:= visVC4RefreshImg;
+	ViShowImgOnVC4_0.CFG				:= gVisionImage.CFG;
+	ViShowImgOnVC4_0.PowerlinkNode		:= gVisionSensor[LIMIT(1, visSelectedSensor, MAX_NUM_CAMS)].CFG.PowerlinkNode;
+	ViShowImgOnVC4_0.ImgWidthInVC4_px	:= 500; // Pixel
+	ViShowImgOnVC4_0();
+	IF ViShowImgOnVC4_0.RefreshDone THEN
+		visVC4RefreshImg := FALSE;
+	END_IF
+	
+	// Refreh crosshairs when new image is available
+	IF EDGENEG(gVisionSensor[visSelectedSensor].CMD.ImageTrigger) THEN
+		gVisionImage.CMD.RefreshCrosshair := TRUE;
+	END_IF
+	gVisionImage.DAT.VisionDisabled := NOT gVisionSensor[visSelectedSensor].DAT.Enable;
+	
 	brsmemcpy(ADR(RemCfgImage), ADR(gVisionImage.CFG), SIZEOF(RemCfgImage)); // Save settings to remanent variable
+END_PROGRAM
+
+
+PROGRAM _EXIT
+  
+	(* After download make sure to close this connection. If this is not closed the functionblock cant retrieve the new information *)
+	TcpForward_0.Enable := FALSE;
+	TcpForward_0();
+    
 END_PROGRAM

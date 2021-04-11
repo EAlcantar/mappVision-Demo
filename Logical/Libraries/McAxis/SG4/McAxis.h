@@ -1,6 +1,6 @@
 /* Automation Studio generated header file */
 /* Do not edit ! */
-/* McAxis 5.10.1 */
+/* McAxis 5.14.0 */
 
 #ifndef _MCAXIS_
 #define _MCAXIS_
@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
 #ifndef _McAxis_VERSION
-#define _McAxis_VERSION 5.10.1
+#define _McAxis_VERSION 5.14.0
 #endif
 
 #include <bur/plctypes.h>
@@ -31,18 +31,6 @@ extern "C"
 #endif
 
 /* Datatypes and datatypes of function blocks */
-typedef enum McBrakeCmdEnum
-{	mcBRAKE_CLOSE,
-	mcBRAKE_OPEN,
-	mcBRAKE_GET_STATUS
-} McBrakeCmdEnum;
-
-typedef enum McBrakeStatusEnum
-{	mcBRAKE_STATUS_NOT_PROVIDED,
-	mcBRAKE_CLOSED,
-	mcBRAKE_OPENED
-} McBrakeStatusEnum;
-
 typedef enum McDirectionEnum
 {	mcDIR_POSITIVE,
 	mcDIR_NEGATIVE,
@@ -113,6 +101,34 @@ typedef enum McCamSectLawOfMotionEnum
 	mcCAMSECTLAW_MOD_SINE_CURVE = 7,
 	mcCAMSECTLAW_HARMONIC_COMBI = 8
 } McCamSectLawOfMotionEnum;
+
+typedef enum McEventSrcEnum
+{	mcEVENT_SRC_TRIGGER1 = 0,
+	mcEVENT_SRC_TRIGGER2 = 1
+} McEventSrcEnum;
+
+typedef enum McBrTouchProbeModeEnum
+{	mcTP_MODE_WITHOUT_PERIOD = 4,
+	mcTP_MODE_SHIFT_FROM_RESULT = 49,
+	mcTP_MODE_SHIFT_FROM_EXPECTED = 50
+} McBrTouchProbeModeEnum;
+
+typedef enum McBrTriggerInfoStatusEnum
+{	mcTRG_STAT_WAITING = 0,
+	mcTRG_STAT_VALID = 1,
+	mcTRG_STAT_MISSED = 2
+} McBrTriggerInfoStatusEnum;
+
+typedef enum McDisableModeEnum
+{	mcDISABLE_DEFAULT = 0,
+	mcDISABLE_KEEP_VALUE = 1
+} McDisableModeEnum;
+
+typedef enum McEventMoveModeEnum
+{	mcEVENT_ONCE = 0,
+	mcEVENT_CYCLIC = 1,
+	mcEVENT_CYCLIC_ALL_EVENTS = 2
+} McEventMoveModeEnum;
 
 typedef enum McShiftModeEnum
 {	mcSHIFT_ABSOLUTE,
@@ -264,6 +280,31 @@ typedef enum McAdvCamInModeEnum
 	mcCAM_DIRECT_LEAD_OUT
 } McAdvCamInModeEnum;
 
+typedef enum McCamAutPrepRestartModeEnum
+{	mcPREP_RESTART_POSITIVE,
+	mcPREP_RESTART_NEGATIVE,
+	mcPREP_RESTART_SHORTEST_WAY,
+	mcPREP_RESTART_POSITIVE_WINDOW,
+	mcPREP_RESTART_NEGATIVE_WINDOW,
+	mcPREP_RESTART_GET_POSITION
+} McCamAutPrepRestartModeEnum;
+
+typedef enum McAdvBrCamTransCamModeEnum
+{	mcCAM_MODE_DISTANCE_BASED,
+	mcCAM_MODE_TIME_BASED
+} McAdvBrCamTransCamModeEnum;
+
+typedef enum McAdvBrCamTransTransModeEnum
+{	mcCAM_TRANS_MODE_OFF,
+	mcCAM_TRANS_MODE_ON,
+	mcCAM_TRANS_MODE_OFF_LEAD_IN,
+	mcCAM_TRANS_MODE_OFF_LEAD_OUT,
+	mcCAM_TRANS_MODE_OFF_LEAD_IN_OUT,
+	mcCAM_TRANS_MODE_ON_LEAD_IN,
+	mcCAM_TRANS_MODE_ON_LEAD_OUT,
+	mcCAM_TRANS_MODE_ON_LEAD_IN_OUT
+} McAdvBrCamTransTransModeEnum;
+
 typedef enum McABTEnum
 {	mcABT_LIN_BD = 0,
 	mcABT_LIN = 1,
@@ -294,6 +335,84 @@ typedef enum McAMoveLimDecEnum
 	mcAMLD_ADV = 1
 } McAMoveLimDecEnum;
 
+typedef enum McAFDCSTypEnum
+{	mcAFDCST_ACP = 0
+} McAFDCSTypEnum;
+
+typedef enum McAFDCSTypAcpValSrcRTOAEnum
+{	mcAFDCSTAVSRTOA_NOT_USE = 0,
+	mcAFDCSTAVSRTOA_USE = 1
+} McAFDCSTypAcpValSrcRTOAEnum;
+
+typedef enum McAFDCSTypAcpValSrcParIDEnum
+{	mcAFDCSTAVSP_NOT_USE = 1,
+	mcAFDCSTAVSP_USE = 2
+} McAFDCSTypAcpValSrcParIDEnum;
+
+typedef enum McAFDCSTypAcpOutEnum
+{	mcAFDCSTAO_ACP_HW = 0,
+	mcAFDCSTAO_ACP_PARID = 1
+} McAFDCSTypAcpOutEnum;
+
+typedef enum McAFDCSTypAcpOutAcpHwProdFamEnum
+{	mcAFDCSTAOAHPF_ACP = 0,
+	mcAFDCSTAOAHPF_ACPM = 1,
+	mcAFDCSTAOAHPF_ACP_P3 = 2
+} McAFDCSTypAcpOutAcpHwProdFamEnum;
+
+typedef enum McAFDCSACOPOSDigOutEnum
+{	mcAFDCSACOPOSDO_SS2X111 = 0,
+	mcAFDCSACOPOSDO_SS2X112 = 1,
+	mcAFDCSACOPOSDO_SS2X113 = 2,
+	mcAFDCSACOPOSDO_SS2X114 = 3,
+	mcAFDCSACOPOSDO_SS2X115 = 4,
+	mcAFDCSACOPOSDO_SS2X116 = 5,
+	mcAFDCSACOPOSDO_SS2X117 = 6,
+	mcAFDCSACOPOSDO_SS2X118 = 7,
+	mcAFDCSACOPOSDO_SS2X119 = 8,
+	mcAFDCSACOPOSDO_SS2X1110 = 9,
+	mcAFDCSACOPOSDO_SS3X111 = 10,
+	mcAFDCSACOPOSDO_SS3X112 = 11,
+	mcAFDCSACOPOSDO_SS3X113 = 12,
+	mcAFDCSACOPOSDO_SS3X114 = 13,
+	mcAFDCSACOPOSDO_SS3X115 = 14,
+	mcAFDCSACOPOSDO_SS3X116 = 15,
+	mcAFDCSACOPOSDO_SS3X117 = 16,
+	mcAFDCSACOPOSDO_SS3X118 = 17,
+	mcAFDCSACOPOSDO_SS3X119 = 18,
+	mcAFDCSACOPOSDO_SS3X1110 = 19,
+	mcAFDCSACOPOSDO_SS4X111 = 20,
+	mcAFDCSACOPOSDO_SS4X112 = 21,
+	mcAFDCSACOPOSDO_SS4X113 = 22,
+	mcAFDCSACOPOSDO_SS4X114 = 23,
+	mcAFDCSACOPOSDO_SS4X115 = 24,
+	mcAFDCSACOPOSDO_SS4X116 = 25,
+	mcAFDCSACOPOSDO_SS4X117 = 26,
+	mcAFDCSACOPOSDO_SS4X118 = 27,
+	mcAFDCSACOPOSDO_SS4X119 = 28,
+	mcAFDCSACOPOSDO_SS4X1110 = 29
+} McAFDCSACOPOSDigOutEnum;
+
+typedef enum McAFDCSACOPOSmultiDigOutEnum
+{	mcAFDCSACOPOSMULTIDO_SS1X111 = 0,
+	mcAFDCSACOPOSMULTIDO_SS1X113 = 1,
+	mcAFDCSACOPOSMULTIDO_SS1X115 = 2,
+	mcAFDCSACOPOSMULTIDO_SS1X116 = 3
+} McAFDCSACOPOSmultiDigOutEnum;
+
+typedef enum McAFDCSACOPOSP3DigOutEnum
+{	mcAFDCSACOPOSP3DO_SS1X41E1 = 0,
+	mcAFDCSACOPOSP3DO_SS1X41E2 = 1,
+	mcAFDCSACOPOSP3DO_SS1X41E3 = 2,
+	mcAFDCSACOPOSP3DO_SS1X41E4 = 3,
+	mcAFDCSACOPOSP3DO_SS1X41E5 = 4,
+	mcAFDCSACOPOSP3DO_SS1X41E6 = 5,
+	mcAFDCSACOPOSP3DO_SS1X41E7 = 6,
+	mcAFDCSACOPOSP3DO_SS1X41E8 = 7,
+	mcAFDCSACOPOSP3DO_SS1X41E9 = 8,
+	mcAFDCSACOPOSP3DO_SS1X41E10 = 9
+} McAFDCSACOPOSP3DigOutEnum;
+
 typedef struct McLibraryInfoType
 {	plcstring Name[33];
 } McLibraryInfoType;
@@ -313,6 +432,7 @@ typedef struct McAddInfoType
 	unsigned long StartupCount;
 	enum McCommunicationStateEnum CommunicationState;
 	enum McAxisPLCopenStateEnum PLCopenState;
+	plcbit InMotion;
 } McAddInfoType;
 
 typedef struct McAdvVelCtrlParType
@@ -391,6 +511,7 @@ typedef struct McCamAutCompParType
 	float MaxSlaveCompAccel1;
 	float MaxSlaveCompAccel2;
 	float SlaveCompJoltTime;
+	float SlaveCompJerk;
 } McCamAutCompParType;
 
 typedef struct McCamAutMasterAxisType
@@ -483,6 +604,7 @@ typedef struct McCamAutParType
 typedef struct McCamAutDefineType
 {	plcstring DataObjectName[33];
 	unsigned long DataAddress;
+	unsigned long DataSize;
 } McCamAutDefineType;
 
 typedef struct McPolynomialDataType
@@ -536,6 +658,7 @@ typedef struct McAdvCamInLeadInOutParType
 	unsigned short CamID;
 	signed long MasterScaling;
 	signed long SlaveScaling;
+	float Jerk;
 } McAdvCamInLeadInOutParType;
 
 typedef struct McAdvBrCamInParType
@@ -545,25 +668,132 @@ typedef struct McAdvBrCamInParType
 	enum McValueSrcEnum MasterValueSource;
 	float MasterMaxVelocity;
 	float Jerk;
+	float Deceleration;
 } McAdvBrCamInParType;
 
-typedef struct McDigCamSwSwitchesParType
-{	signed short TrackNumber;
-	double FirstOnPosition[17];
-	double LastOnPosition[17];
-	float Period;
-} McDigCamSwSwitchesParType;
+typedef struct McTriggerType
+{	enum McValueSrcEnum ValueSource;
+	enum McEventSrcEnum EventSource;
+	enum McEdgeEnum Edge;
+	unsigned char TouchProbeID;
+} McTriggerType;
 
-typedef struct McDigCamSwOutputsParType
-{	struct McAxisType* Axis;
-	plcbit* VariableAddress;
-} McDigCamSwOutputsParType;
+typedef struct McBrTriggerType
+{	enum McValueSrcEnum ValueSource;
+	enum McEventSrcEnum EventSource;
+	enum McEdgeEnum Edge;
+	double MinWidth;
+	double MaxWidth;
+	float SensorDelay;
+	plcbit DisableWidthEvaluationAtStart;
+} McBrTriggerType;
 
-typedef struct McDigCamSwTrackOptParType
-{	plctime OnCompensation;
-	plctime OffCompensation;
+typedef struct McAdvBrTouchProbeParType
+{	plcbit UseFirstTriggerPosition;
+	plcbit UseAxisPeriod;
+	plcbit UpdatePeriod;
+	plcbit ReadTriggerWidth;
+} McAdvBrTouchProbeParType;
+
+typedef struct McBrTriggerInfoType
+{	double Width;
+	enum McBrTriggerInfoStatusEnum Status;
+} McBrTriggerInfoType;
+
+typedef struct McDigCamSwOnPositionsParType
+{	double FirstOnPosition;
+	double LastOnPosition;
+} McDigCamSwOnPositionsParType;
+
+typedef struct McDigCamSwDataSetParType
+{	unsigned char NumberOfSwitches;
+	struct McDigCamSwOnPositionsParType SwitchPositions[64];
+} McDigCamSwDataSetParType;
+
+typedef struct McDigCamSwitchOptionsParType
+{	struct McDigCamSwDataSetParType DataSet[5];
+	double Period;
+	double StartPosition;
+} McDigCamSwitchOptionsParType;
+
+typedef struct McDigCamSwTrackOptionsParType
+{	float OnCompensation;
+	float OffCompensation;
+	float Filter;
 	float Hysteresis;
-} McDigCamSwTrackOptParType;
+	plcbit DisableNegativeDirection;
+} McDigCamSwTrackOptionsParType;
+
+typedef struct McDigCamSwOptionsParType
+{	plcstring FeatureName[251];
+} McDigCamSwOptionsParType;
+
+typedef struct McAdvCamAutPrepRestartParType
+{	double ToleranceWindow;
+} McAdvCamAutPrepRestartParType;
+
+typedef struct McAdvCyclicTorqueFFParType
+{	enum McDisableModeEnum DisableMode;
+} McAdvCyclicTorqueFFParType;
+
+typedef struct McAdvBrCamTransLeadInOutParType
+{	double MasterDistance;
+	double SlaveDistance;
+	double MasterOffset;
+	float Jerk;
+} McAdvBrCamTransLeadInOutParType;
+
+typedef struct McAdvBrCamDwellParType
+{	struct McAdvBrCamTransLeadInOutParType LeadIn;
+	struct McAdvBrCamTransLeadInOutParType LeadOut;
+	enum McValueSrcEnum MasterValueSource;
+	float MasterMaxVelocity;
+	float Jerk;
+	float Deceleration;
+} McAdvBrCamDwellParType;
+
+typedef struct McAdvBrAutoCamDwellParType
+{	struct McAdvBrCamTransLeadInOutParType LeadIn;
+	struct McAdvBrCamTransLeadInOutParType LeadOut;
+	enum McValueSrcEnum MasterValueSource;
+	float MasterMaxVelocity;
+	float Jerk;
+	float Deceleration;
+} McAdvBrAutoCamDwellParType;
+
+typedef struct McAdvBrCamTransitionParType
+{	struct McAdvBrCamTransLeadInOutParType LeadIn;
+	struct McAdvBrCamTransLeadInOutParType LeadOut;
+	enum McValueSrcEnum MasterValueSource;
+	float MasterMaxVelocity;
+	float CamTime;
+	enum McAdvBrCamTransCamModeEnum CamMode;
+	enum McAdvBrCamTransTransModeEnum TransitionMode;
+	float Jerk;
+	float Deceleration;
+} McAdvBrCamTransitionParType;
+
+typedef struct McBrAdvCamSaveDatObjType
+{	unsigned short DataObjectVersion;
+} McBrAdvCamSaveDatObjType;
+
+typedef struct McEventType
+{	enum McEventSrcEnum Event;
+	enum McEdgeEnum Edge;
+} McEventType;
+
+typedef struct McAdvEventMoveParType
+{	enum McEventMoveModeEnum Mode;
+} McAdvEventMoveParType;
+
+typedef struct McDigitalInputsPvIfType
+{	plcbit HomingSwitch;
+	plcbit PositiveLimitSwitch;
+	plcbit NegativeLimitSwitch;
+	plcbit Trigger1;
+	plcbit Trigger2;
+	plcbit Quickstop;
+} McDigitalInputsPvIfType;
 
 typedef struct McABTLinBdType
 {	enum McCfgLocLenUnitEnum MeasurementUnit;
@@ -676,29 +906,87 @@ typedef struct McCfgAxMoveLimType
 {	struct McAMLType MovementLimits;
 } McCfgAxMoveLimType;
 
-typedef struct MC_DigitalCamSwitch
-{
-	/* VAR_INPUT (analog) */
-	struct McAxisType* Axis;
-	struct McDigCamSwSwitchesParType Switches;
-	struct McDigCamSwOutputsParType Outputs;
-	struct McDigCamSwTrackOptParType TrackOptions;
-	/* VAR_OUTPUT (analog) */
-	signed long ErrorID;
-	/* VAR (analog) */
-	struct McInternalType Internal;
-	/* VAR_INPUT (digital) */
-	plcbit Enable;
-	plcbit InitSwitches;
-	plcbit InitTrackOptions;
-	plcbit EnableMask;
-	/* VAR_OUTPUT (digital) */
-	plcbit InOperation;
-	plcbit Busy;
-	plcbit Error;
-	plcbit SwitchesInitialized;
-	plcbit TrackOptionsInitialized;
-} MC_DigitalCamSwitch_typ;
+typedef struct McAFDCSTypAcpValSrcRTOAUseType
+{	struct McCfgReferenceType AxisReference;
+} McAFDCSTypAcpValSrcRTOAUseType;
+
+typedef struct McAFDCSTypAcpValSrcRTOAType
+{	enum McAFDCSTypAcpValSrcRTOAEnum Type;
+	struct McAFDCSTypAcpValSrcRTOAUseType Used;
+} McAFDCSTypAcpValSrcRTOAType;
+
+typedef struct McAFDCSTypAcpValSrcParIDUseType
+{	unsigned short ParID;
+} McAFDCSTypAcpValSrcParIDUseType;
+
+typedef struct McAFDCSTypAcpValSrcParIDType
+{	enum McAFDCSTypAcpValSrcParIDEnum Type;
+	struct McAFDCSTypAcpValSrcParIDUseType Used;
+} McAFDCSTypAcpValSrcParIDType;
+
+typedef struct McAFDCSTypAcpValSrcType
+{	struct McAFDCSTypAcpValSrcRTOAType ReferenceToOtherAxis;
+	struct McAFDCSTypAcpValSrcParIDType ParID;
+} McAFDCSTypAcpValSrcType;
+
+typedef struct McAFDCSACOPOSDigOutType
+{	enum McAFDCSACOPOSDigOutEnum Type;
+} McAFDCSACOPOSDigOutType;
+
+typedef struct McAFDCSACOPOSType
+{	struct McAFDCSACOPOSDigOutType DigitalOutput;
+} McAFDCSACOPOSType;
+
+typedef struct McAFDCSACOPOSmultiDigOutType
+{	enum McAFDCSACOPOSmultiDigOutEnum Type;
+} McAFDCSACOPOSmultiDigOutType;
+
+typedef struct McAFDCSACOPOSmultiType
+{	struct McAFDCSACOPOSmultiDigOutType DigitalOutput;
+} McAFDCSACOPOSmultiType;
+
+typedef struct McAFDCSACOPOSP3DigOutType
+{	enum McAFDCSACOPOSP3DigOutEnum Type;
+} McAFDCSACOPOSP3DigOutType;
+
+typedef struct McAFDCSACOPOSP3Type
+{	struct McAFDCSACOPOSP3DigOutType DigitalOutput;
+} McAFDCSACOPOSP3Type;
+
+typedef struct McAFDCSTypAcpOutAcpHwProdFamType
+{	enum McAFDCSTypAcpOutAcpHwProdFamEnum Type;
+	struct McAFDCSACOPOSType ACOPOS;
+	struct McAFDCSACOPOSmultiType ACOPOSmulti;
+	struct McAFDCSACOPOSP3Type ACOPOSP3;
+} McAFDCSTypAcpOutAcpHwProdFamType;
+
+typedef struct McAFDCSTypAcpOutAcpHwType
+{	struct McAFDCSTypAcpOutAcpHwProdFamType ProductFamily;
+} McAFDCSTypAcpOutAcpHwType;
+
+typedef struct McAFDCSTypAcpOutAcpParIDType
+{	unsigned short ParID;
+} McAFDCSTypAcpOutAcpParIDType;
+
+typedef struct McAFDCSTypAcpOutType
+{	enum McAFDCSTypAcpOutEnum Type;
+	struct McAFDCSTypAcpOutAcpHwType ACOPOSHardware;
+	struct McAFDCSTypAcpOutAcpParIDType ACOPOSParID;
+} McAFDCSTypAcpOutType;
+
+typedef struct McAFDCSTypAcpType
+{	struct McAFDCSTypAcpValSrcType ValueSource;
+	struct McAFDCSTypAcpOutType Output;
+} McAFDCSTypAcpType;
+
+typedef struct McAFDCSTypType
+{	enum McAFDCSTypEnum Type;
+	struct McAFDCSTypAcpType ACOPOS;
+} McAFDCSTypType;
+
+typedef struct McCfgAxFeatDigCamSwType
+{	struct McAFDCSTypType DigitalCamSwitchType;
+} McCfgAxFeatDigCamSwType;
 
 typedef struct MC_BR_GetAxisLibraryInfo
 {
@@ -1521,6 +1809,24 @@ typedef struct MC_BR_CamPrepare
 	plcbit Error;
 } MC_BR_CamPrepare_typ;
 
+typedef struct MC_BR_CamSaveDataObject
+{
+	/* VAR_INPUT (analog) */
+	struct McCamDefineType Data;
+	struct McBrAdvCamSaveDatObjType AdvancedParameters;
+	/* VAR_OUTPUT (analog) */
+	signed long ErrorID;
+	unsigned long DataObjectIdent;
+	/* VAR (analog) */
+	struct McExec1InternalType Internal;
+	/* VAR_INPUT (digital) */
+	plcbit Execute;
+	/* VAR_OUTPUT (digital) */
+	plcbit Done;
+	plcbit Busy;
+	plcbit Error;
+} MC_BR_CamSaveDataObject_typ;
+
 typedef struct MC_BR_CommandError
 {
 	/* VAR_INPUT (analog) */
@@ -1795,10 +2101,371 @@ typedef struct MC_BR_GetCamSlavePosition
 	plcbit Error;
 } MC_BR_GetCamSlavePosition_typ;
 
+typedef struct MC_DigitalCamSwitch
+{
+	/* VAR_INPUT (analog) */
+	struct McAxisType* Axis;
+	struct McDigCamSwitchOptionsParType Switches;
+	struct McDigCamSwTrackOptionsParType TrackOptions;
+	struct McDigCamSwOptionsParType GeneralOptions;
+	enum McValueSrcEnum ValueSource;
+	unsigned char DataSetSelector;
+	/* VAR_OUTPUT (analog) */
+	signed long ErrorID;
+	unsigned char ActualDataSet;
+	/* VAR (analog) */
+	struct McInternalType Internal;
+	/* VAR_INPUT (digital) */
+	plcbit Enable;
+	plcbit InitDataSet;
+	plcbit ChangeDataSet;
+	plcbit InitTrackOptions;
+	plcbit EnableDigOut;
+	plcbit ForceOutput;
+	/* VAR_OUTPUT (digital) */
+	plcbit InOperation;
+	plcbit Busy;
+	plcbit Error;
+	plcbit DataSetInitialized;
+	plcbit TrackOptionsInitialized;
+	plcbit Value;
+} MC_DigitalCamSwitch_typ;
+
+typedef struct MC_AbortTrigger
+{
+	/* VAR_INPUT (analog) */
+	struct McAxisType* Axis;
+	struct McTriggerType TriggerInput;
+	/* VAR_OUTPUT (analog) */
+	signed long ErrorID;
+	/* VAR (analog) */
+	struct McInternalType Internal;
+	/* VAR_INPUT (digital) */
+	plcbit Execute;
+	/* VAR_OUTPUT (digital) */
+	plcbit Done;
+	plcbit Busy;
+	plcbit Error;
+} MC_AbortTrigger_typ;
+
+typedef struct MC_TouchProbe
+{
+	/* VAR_INPUT (analog) */
+	struct McAxisType* Axis;
+	struct McTriggerType TriggerInput;
+	double FirstPosition;
+	double LastPosition;
+	/* VAR_OUTPUT (analog) */
+	signed long ErrorID;
+	double RecordedPosition;
+	/* VAR (analog) */
+	struct McInternalType Internal;
+	/* VAR_INPUT (digital) */
+	plcbit Execute;
+	plcbit WindowOnly;
+	/* VAR_OUTPUT (digital) */
+	plcbit Done;
+	plcbit Busy;
+	plcbit CommandAborted;
+	plcbit Error;
+} MC_TouchProbe_typ;
+
+typedef struct MC_BR_TouchProbe
+{
+	/* VAR_INPUT (analog) */
+	struct McAxisType* Axis;
+	struct McBrTriggerType TriggerInput;
+	double Period;
+	double PeriodChange;
+	double ExpectedValue;
+	double WindowNegative;
+	double WindowPositive;
+	enum McBrTouchProbeModeEnum Mode;
+	struct McAdvBrTouchProbeParType AdvancedParameters;
+	/* VAR_OUTPUT (analog) */
+	signed long ErrorID;
+	double RecordedPeriodicValue;
+	double RecordedValue;
+	double DeltaExpectedValue;
+	unsigned long ValidTriggerCount;
+	unsigned long MissedTriggerCount;
+	struct McBrTriggerInfoType TriggerInfo;
+	/* VAR (analog) */
+	struct McInternalType Internal;
+	/* VAR_INPUT (digital) */
+	plcbit Enable;
+	/* VAR_OUTPUT (digital) */
+	plcbit InOperation;
+	plcbit Busy;
+	plcbit Error;
+} MC_BR_TouchProbe_typ;
+
+typedef struct MC_BR_CyclicTorqueFeedForward
+{
+	/* VAR_INPUT (analog) */
+	struct McAxisType* Axis;
+	enum McIplModeEnum InterpolationMode;
+	struct McAdvCyclicTorqueFFParType AdvancedParameters;
+	float CyclicTorque;
+	/* VAR_OUTPUT (analog) */
+	signed long ErrorID;
+	/* VAR (analog) */
+	struct McInternalType Internal;
+	/* VAR_INPUT (digital) */
+	plcbit Enable;
+	/* VAR_OUTPUT (digital) */
+	plcbit Valid;
+	plcbit Busy;
+	plcbit Error;
+} MC_BR_CyclicTorqueFeedForward_typ;
+
+typedef struct MC_BR_CamAutomatPrepareRestart
+{
+	/* VAR_INPUT (analog) */
+	struct McAxisType* Slave;
+	float Velocity;
+	float Acceleration;
+	float Deceleration;
+	float Jerk;
+	enum McCamAutPrepRestartModeEnum Mode;
+	struct McAdvCamAutPrepRestartParType AdvancedParameters;
+	/* VAR_OUTPUT (analog) */
+	signed long ErrorID;
+	double RestartPosition;
+	/* VAR (analog) */
+	struct McInternalType Internal;
+	/* VAR_INPUT (digital) */
+	plcbit Execute;
+	/* VAR_OUTPUT (digital) */
+	plcbit Done;
+	plcbit Busy;
+	plcbit Active;
+	plcbit CommandAborted;
+	plcbit Error;
+} MC_BR_CamAutomatPrepareRestart_typ;
+
+typedef struct MC_BR_CheckRestorePositionData
+{
+	/* VAR_INPUT (analog) */
+	struct McAxisType* Axis;
+	unsigned long DataAddress;
+	/* VAR_OUTPUT (analog) */
+	signed long ErrorID;
+	/* VAR (analog) */
+	struct McInternalType Internal;
+	/* VAR_INPUT (digital) */
+	plcbit Execute;
+	/* VAR_OUTPUT (digital) */
+	plcbit Done;
+	plcbit Busy;
+	plcbit Error;
+	plcbit DataInUse;
+	plcbit DataValid;
+} MC_BR_CheckRestorePositionData_typ;
+
+typedef struct MC_BR_CamDwell
+{
+	/* VAR_INPUT (analog) */
+	struct McAxisType* Master;
+	struct McAxisType* Slave;
+	unsigned short CamID;
+	signed long MasterScaling;
+	signed long SlaveScaling;
+	double MasterStartPosition;
+	double MasterDwellDistance;
+	struct McAdvBrCamDwellParType AdvancedParameters;
+	/* VAR_OUTPUT (analog) */
+	signed long ErrorID;
+	/* VAR (analog) */
+	struct McInternalTwoRefType Internal;
+	/* VAR_INPUT (digital) */
+	plcbit Enable;
+	plcbit InitData;
+	plcbit LeadIn;
+	plcbit LeadOut;
+	/* VAR_OUTPUT (digital) */
+	plcbit Valid;
+	plcbit Busy;
+	plcbit CommandAborted;
+	plcbit Error;
+	plcbit DataInitialized;
+	plcbit Running;
+	plcbit InLeadIn;
+	plcbit InCam;
+	plcbit InDwell;
+	plcbit InLeadOut;
+} MC_BR_CamDwell_typ;
+
+typedef struct MC_BR_AutoCamDwell
+{
+	/* VAR_INPUT (analog) */
+	struct McAxisType* Master;
+	struct McAxisType* Slave;
+	double MasterLength;
+	double SlaveLength;
+	double MasterStartPosition;
+	double MasterDwellDistance;
+	struct McAdvBrAutoCamDwellParType AdvancedParameters;
+	/* VAR_OUTPUT (analog) */
+	signed long ErrorID;
+	/* VAR (analog) */
+	struct McInternalTwoRefType Internal;
+	/* VAR_INPUT (digital) */
+	plcbit Enable;
+	plcbit InitData;
+	plcbit LeadIn;
+	plcbit LeadOut;
+	/* VAR_OUTPUT (digital) */
+	plcbit Valid;
+	plcbit Busy;
+	plcbit CommandAborted;
+	plcbit Error;
+	plcbit DataInitialized;
+	plcbit Running;
+	plcbit InLeadIn;
+	plcbit InCam;
+	plcbit InDwell;
+	plcbit InLeadOut;
+} MC_BR_AutoCamDwell_typ;
+
+typedef struct MC_BR_CamTransition
+{
+	/* VAR_INPUT (analog) */
+	struct McAxisType* Master;
+	struct McAxisType* Slave;
+	unsigned short CamID;
+	signed long MasterScaling;
+	signed long SlaveScaling;
+	double MasterInterval;
+	double SlaveInterval;
+	double MasterStartPosition;
+	struct McAdvBrCamTransitionParType AdvancedParameters;
+	/* VAR_OUTPUT (analog) */
+	signed long ErrorID;
+	/* VAR (analog) */
+	struct McInternalTwoRefType Internal;
+	/* VAR_INPUT (digital) */
+	plcbit Enable;
+	plcbit InitData;
+	plcbit LeadIn;
+	plcbit LeadOut;
+	/* VAR_OUTPUT (digital) */
+	plcbit Valid;
+	plcbit Busy;
+	plcbit CommandAborted;
+	plcbit Error;
+	plcbit DataInitialized;
+	plcbit Running;
+	plcbit InLeadIn;
+	plcbit InCam;
+	plcbit InTransition;
+	plcbit InLeadOut;
+} MC_BR_CamTransition_typ;
+
+typedef struct MC_BR_EventMoveAbsolute
+{
+	/* VAR_INPUT (analog) */
+	struct McAxisType* Axis;
+	double Position;
+	float Velocity;
+	float Acceleration;
+	float Deceleration;
+	float Jerk;
+	enum McDirectionEnum Direction;
+	struct McEventType Event;
+	struct McAdvEventMoveParType AdvancedParameters;
+	/* VAR_OUTPUT (analog) */
+	signed long ErrorID;
+	/* VAR (analog) */
+	struct McInternalType Internal;
+	/* VAR_INPUT (digital) */
+	plcbit Execute;
+	/* VAR_OUTPUT (digital) */
+	plcbit InPosition;
+	plcbit Busy;
+	plcbit Active;
+	plcbit CommandAborted;
+	plcbit Error;
+	plcbit WaitingForEvent;
+} MC_BR_EventMoveAbsolute_typ;
+
+typedef struct MC_BR_EventMoveAdditive
+{
+	/* VAR_INPUT (analog) */
+	struct McAxisType* Axis;
+	double Distance;
+	float Velocity;
+	float Acceleration;
+	float Deceleration;
+	float Jerk;
+	struct McEventType Event;
+	struct McAdvEventMoveParType AdvancedParameters;
+	/* VAR_OUTPUT (analog) */
+	signed long ErrorID;
+	/* VAR (analog) */
+	struct McInternalType Internal;
+	/* VAR_INPUT (digital) */
+	plcbit Execute;
+	/* VAR_OUTPUT (digital) */
+	plcbit InPosition;
+	plcbit Busy;
+	plcbit Active;
+	plcbit CommandAborted;
+	plcbit Error;
+	plcbit WaitingForEvent;
+} MC_BR_EventMoveAdditive_typ;
+
+typedef struct MC_BR_EventMoveVelocity
+{
+	/* VAR_INPUT (analog) */
+	struct McAxisType* Axis;
+	float Velocity;
+	float Acceleration;
+	float Deceleration;
+	float Jerk;
+	enum McDirectionEnum Direction;
+	struct McEventType Event;
+	struct McAdvEventMoveParType AdvancedParameters;
+	/* VAR_OUTPUT (analog) */
+	signed long ErrorID;
+	/* VAR (analog) */
+	struct McInternalType Internal;
+	/* VAR_INPUT (digital) */
+	plcbit Execute;
+	/* VAR_OUTPUT (digital) */
+	plcbit InVelocity;
+	plcbit Busy;
+	plcbit Active;
+	plcbit CommandAborted;
+	plcbit Error;
+	plcbit WaitingForEvent;
+} MC_BR_EventMoveVelocity_typ;
+
+typedef struct MC_BR_ForceHardwareInputs
+{
+	/* VAR_INPUT (analog) */
+	struct McAxisType* Axis;
+	/* VAR_OUTPUT (analog) */
+	signed long ErrorID;
+	/* VAR (analog) */
+	struct McInternalType Internal;
+	/* VAR_INPUT (digital) */
+	plcbit Enable;
+	plcbit HomingSwitch;
+	plcbit PositiveLimitSwitch;
+	plcbit NegativeLimitSwitch;
+	plcbit Trigger1;
+	plcbit Trigger2;
+	/* VAR_OUTPUT (digital) */
+	plcbit Valid;
+	plcbit Busy;
+	plcbit Error;
+	plcbit Ready;
+} MC_BR_ForceHardwareInputs_typ;
+
 
 
 /* Prototyping of functions and function blocks */
-_BUR_PUBLIC void MC_DigitalCamSwitch(struct MC_DigitalCamSwitch* inst);
 _BUR_PUBLIC void MC_BR_GetAxisLibraryInfo(struct MC_BR_GetAxisLibraryInfo* inst);
 _BUR_PUBLIC void MC_Power(struct MC_Power* inst);
 _BUR_PUBLIC void MC_Home(struct MC_Home* inst);
@@ -1837,6 +2504,7 @@ _BUR_PUBLIC void MC_CamIn(struct MC_CamIn* inst);
 _BUR_PUBLIC void MC_BR_CamIn(struct MC_BR_CamIn* inst);
 _BUR_PUBLIC void MC_CamOut(struct MC_CamOut* inst);
 _BUR_PUBLIC void MC_BR_CamPrepare(struct MC_BR_CamPrepare* inst);
+_BUR_PUBLIC void MC_BR_CamSaveDataObject(struct MC_BR_CamSaveDataObject* inst);
 _BUR_PUBLIC void MC_BR_CommandError(struct MC_BR_CommandError* inst);
 _BUR_PUBLIC void MC_PhasingAbsolute(struct MC_PhasingAbsolute* inst);
 _BUR_PUBLIC void MC_PhasingRelative(struct MC_PhasingRelative* inst);
@@ -1850,6 +2518,20 @@ _BUR_PUBLIC void MC_BR_CalcCamFromSections(struct MC_BR_CalcCamFromSections* ins
 _BUR_PUBLIC void MC_BR_CalcSectionsFromCam(struct MC_BR_CalcSectionsFromCam* inst);
 _BUR_PUBLIC void MC_BR_GetCamMasterPosition(struct MC_BR_GetCamMasterPosition* inst);
 _BUR_PUBLIC void MC_BR_GetCamSlavePosition(struct MC_BR_GetCamSlavePosition* inst);
+_BUR_PUBLIC void MC_DigitalCamSwitch(struct MC_DigitalCamSwitch* inst);
+_BUR_PUBLIC void MC_AbortTrigger(struct MC_AbortTrigger* inst);
+_BUR_PUBLIC void MC_TouchProbe(struct MC_TouchProbe* inst);
+_BUR_PUBLIC void MC_BR_TouchProbe(struct MC_BR_TouchProbe* inst);
+_BUR_PUBLIC void MC_BR_CyclicTorqueFeedForward(struct MC_BR_CyclicTorqueFeedForward* inst);
+_BUR_PUBLIC void MC_BR_CamAutomatPrepareRestart(struct MC_BR_CamAutomatPrepareRestart* inst);
+_BUR_PUBLIC void MC_BR_CheckRestorePositionData(struct MC_BR_CheckRestorePositionData* inst);
+_BUR_PUBLIC void MC_BR_CamDwell(struct MC_BR_CamDwell* inst);
+_BUR_PUBLIC void MC_BR_AutoCamDwell(struct MC_BR_AutoCamDwell* inst);
+_BUR_PUBLIC void MC_BR_CamTransition(struct MC_BR_CamTransition* inst);
+_BUR_PUBLIC void MC_BR_EventMoveAbsolute(struct MC_BR_EventMoveAbsolute* inst);
+_BUR_PUBLIC void MC_BR_EventMoveAdditive(struct MC_BR_EventMoveAdditive* inst);
+_BUR_PUBLIC void MC_BR_EventMoveVelocity(struct MC_BR_EventMoveVelocity* inst);
+_BUR_PUBLIC void MC_BR_ForceHardwareInputs(struct MC_BR_ForceHardwareInputs* inst);
 
 
 #ifdef __cplusplus

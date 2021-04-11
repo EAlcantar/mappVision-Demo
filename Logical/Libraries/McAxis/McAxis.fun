@@ -433,7 +433,7 @@ FUNCTION_BLOCK MC_ReadAxisError (*reads an error number and deletes it from the 
     END_VAR
 END_FUNCTION_BLOCK
 
-FUNCTION_BLOCK MC_Reset (*makes the transition from the state ‘ErrorStop’ to ‘Standstill’ or ‘Disabled’*)
+FUNCTION_BLOCK MC_Reset (*makes the transition from the state â€˜ErrorStopâ€™ to â€˜Standstillâ€™ or â€˜Disabledâ€™*)
     VAR_INPUT
         Axis : REFERENCE TO McAxisType; (*axis reference*)
         Execute : BOOL; (*FB is active as long as input is set*)
@@ -684,8 +684,8 @@ FUNCTION_BLOCK MC_GearInPos (*commands a ratio between the velocity of the maste
 		SyncMode : McSyncModeEnum; (*defines the type of synchronization*)
 		MasterStartDistance : LREAL; (*the master distance for the slave to start to synchronize to the master [measurement units of master]*)
 		Velocity : REAL; (*maximum velocity during the movement between StartSync and InSync [measurement units of slave/s]*)
-		Acceleration : REAL; (*maximum acceleration during the movement between StartSync and InSync [measurement units of slave/s²]*)
-		Deceleration : REAL; (*maximum deceleration during the movement between StartSync and InSync [measurement units of slave/s²]*)
+		Acceleration : REAL; (*maximum acceleration during the movement between StartSync and InSync [measurement units of slave/sÂ²]*)
+		Deceleration : REAL; (*maximum deceleration during the movement between StartSync and InSync [measurement units of slave/sÂ²]*)
 		Jerk : REAL; (*maximum jerk during the movement between StartSync and InSync [measurement units of slave/s3]*)
 		BufferMode : McBufferModeEnum; (*defines the chronological sequence of FB*)
 		AdvancedParameters : McAdvGearInPosParType; (*structure for using additional functions*)
@@ -818,6 +818,24 @@ FUNCTION_BLOCK MC_BR_CamPrepare (*prepare cam to use for synchronous movement or
     END_VAR
     VAR
         Internal : McInternalType; (*internal variable*)
+    END_VAR
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK MC_BR_CamSaveDataObject (*save the data of a cam profile into a data object*)
+    VAR_INPUT
+        Execute : BOOL; (*execution of this FB is started on rising edge of the input*)
+        Data : McCamDefineType; (*specify data to save*)
+        AdvancedParameters : McBrAdvCamSaveDatObjType; (*structure for using advanced functions*)
+    END_VAR
+    VAR_OUTPUT
+        Done : BOOL; (*execution successful. FB finished*)
+        Busy : BOOL; (*FB is active and needs to be called*)
+        Error : BOOL; (*error occurred during operation*)
+        ErrorID : DINT; (*error number*)
+        DataObjectIdent  : UDINT; (*ident of the saved data object*)
+    END_VAR
+    VAR
+        Internal : McExec1InternalType; (*Data for internal use*)
     END_VAR
 END_FUNCTION_BLOCK
 
@@ -1095,3 +1113,364 @@ FUNCTION_BLOCK MC_BR_GetCamSlavePosition (*Determine the slave position accordin
     END_VAR
 END_FUNCTION_BLOCK
 
+FUNCTION_BLOCK MC_DigitalCamSwitch (*This fb is analogous to switches on a shaft. It makes it possible to switch an output like a mechanical cam switch that is mounted on an axis*)
+    VAR_INPUT
+        Axis : REFERENCE TO McAxisType; (*Axis reference that should control the output*)
+        Enable : BOOL; (*Function block is active as long as this input is set*)
+        Switches : McDigCamSwitchOptionsParType; (*Input parameter to configure switches and related parameters*)
+		TrackOptions : McDigCamSwTrackOptionsParType; (*Input parameters to configure track specific options*)
+		GeneralOptions : McDigCamSwOptionsParType; (*Input parameters to configure general options*)
+		ValueSource : McValueSrcEnum; (*Source of the position value*)
+		DataSetSelector : USINT; (*Selects the data set to be initialized [0..4]*)
+		InitDataSet : BOOL; (*Initializes the switches set which are configured under DataSetSelector*)
+		ChangeDataSet : BOOL; (*Changes the currently output switches to those which are configured under DataSetSelector*)
+		InitTrackOptions : BOOL; (*Initializes the changed TrackOptions*)
+		EnableDigOut : BOOL; (*Enables the cam switches on the defined output*)
+		ForceOutput : BOOL; (*The ouput is forced to be set*)
+	END_VAR
+	VAR_OUTPUT
+        InOperation : BOOL; (*Controlled track active*)
+		Busy : BOOL; (*Function block is active and must continue to be called*)
+		Error : BOOL; (*Error occurred during operation*)
+        ErrorID : DINT; (*Error number*)
+        DataSetInitialized : BOOL; (*New data set initialized*)
+        TrackOptionsInitialized : BOOL; (*New track options initialized*)
+        Value : BOOL; (*Output value*)
+        ActualDataSet : USINT; (*Index of the currently active data set [0..4]*)
+	END_VAR
+    VAR
+        Internal : McInternalType; (*internal variable*)
+    END_VAR
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK MC_AbortTrigger (*Stops an active latch command (triggered by MC_TouchProbe FB)*)
+    VAR_INPUT
+        Axis : REFERENCE TO McAxisType; (*Axis reference*)
+        TriggerInput : McTriggerType; (*Trigger input definition*)
+		Execute : BOOL; (*Execution of the function block begins on a rising edge of this input*)
+	END_VAR
+	VAR_OUTPUT
+        Done : BOOL; (*Command executed. Trigger function successfully aborted*)
+		Busy : BOOL; (*The function block is active and must continue to be called.*)
+		Error : BOOL; (*Error occurred during operation*)
+        ErrorID : DINT; (*Error number*)
+	END_VAR
+    VAR
+        Internal : McInternalType; (*internal variable*)
+    END_VAR
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK MC_TouchProbe (*This function block saves the value from given source when a specific trigger event occurs*)
+    VAR_INPUT
+        Axis : REFERENCE TO McAxisType; (*Axis reference*)
+        TriggerInput : McTriggerType; (*Trigger input definition*)
+		Execute : BOOL; (*Execution of the function block begins on a rising edge of this input*)
+		WindowOnly : BOOL; (*Accepts trigger events in the window only*)
+		FirstPosition : LREAL; (*Window starting position [measurement unit]*)
+		LastPosition : LREAL; (*Window end position [measurement unit]*)
+	END_VAR
+	VAR_OUTPUT
+        Done : BOOL; (*Command executed. Valid trigger event detected*)
+		Busy : BOOL; (*The function block is active and must continue to be called. Trigger function active, no valid trigger event detected, yet.*)
+		CommandAborted : BOOL; (*Function block aborted by another function block*)
+		Error : BOOL; (*Error occurred during operation*)
+        ErrorID : DINT; (*Error number*)
+		RecordedPosition : LREAL; (*Position at which a valid trigger event is detected [measurement units]*)
+	END_VAR
+    VAR
+        Internal : McInternalType; (*internal variable*)
+    END_VAR
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK MC_BR_TouchProbe (*This function block captures the value from a given value source when a specific trigger event occurs*)
+    VAR_INPUT
+        Axis : REFERENCE TO McAxisType; (*Axis reference*)
+        TriggerInput : McBrTriggerType; (*Trigger input definition*)
+        Enable : BOOL; (*The function block is active as long as input is set*)
+		Period : LREAL; (*Interval between two expected trigger positions. This interval can be different than the period of a periodic axis [measurement units].*)
+		PeriodChange : LREAL; (*If no valid event occurs within an interval, the window is not shifted by the value of the "Period" input, but by the value of "Period" + "PeriodChange". [measurement units].*)
+		ExpectedValue : LREAL; (*Expected position of the trigger event within the "Period" [measurement units].*)
+		WindowNegative : LREAL; (*Range before the expected position in which the trigger signal may occur [measurement units].*)
+		WindowPositive : LREAL; (*Range after the expected position in which the trigger signal may occur [measurement units].*)
+		Mode : McBrTouchProbeModeEnum; (* Operating mode of the function block.*)
+		AdvancedParameters : McAdvBrTouchProbeParType; (*Additional input parameters for optional use with the function block.*)
+	END_VAR
+	VAR_OUTPUT
+        InOperation : BOOL; (* Function block in operation, waiting for trigger event.*)
+		Busy : BOOL; (*The function block is active and must continue to be called.*)
+		Error : BOOL; (*Error occurred during operation*)
+        ErrorID : DINT; (*Error number*)
+        RecordedPeriodicValue : LREAL; (*Result value within the configured period [measurement units].*)
+        RecordedValue : LREAL; (*Result value [measurement units].*)
+        DeltaExpectedValue : LREAL; (*Deviation: Expected position â€“ result value [measurement units].*)
+        ValidTriggerCount : UDINT; (*Number of valid trigger events since "Enable" was set to TRUE.*)
+		MissedTriggerCount : UDINT; (*Number of missed trigger events since "Enable" was set to TRUE.*)
+		TriggerInfo : McBrTriggerInfoType; (*Additional information about the trigger event.*)
+	END_VAR
+    VAR
+        Internal : McInternalType; (*internal variable*)
+    END_VAR
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK MC_BR_CyclicTorqueFeedForward (*feeds forward a cyclically transferred torque*)
+    VAR_INPUT
+        Axis : REFERENCE TO McAxisType; (*axis reference*)
+        Enable : BOOL; (*FB is active as long as input is set*)
+        InterpolationMode : McIplModeEnum; (*interpolation mode of cyclic value on receiving drive*)
+        AdvancedParameters : McAdvCyclicTorqueFFParType; (*additional input parameters for optional use with the function block.*)
+        CyclicTorque : REAL; (*cyclic feed forward torque that is transferred to the axis*)
+    END_VAR
+    VAR_OUTPUT
+        Valid : BOOL; (*initialization complete, feed forward torque is beeing transferred cyclically*)
+        Busy : BOOL; (*FB is active and needs to be called*)
+        Error : BOOL; (*error occurred during operation*)
+        ErrorID : DINT; (*error number*)
+    END_VAR
+    VAR
+        Internal : McInternalType;(*internal variable*)
+    END_VAR
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK MC_BR_CamAutomatPrepareRestart (*commands a motion to a aborted cam automat position*)
+	VAR_INPUT
+		Slave : REFERENCE TO McAxisType; (*axis reference*)
+		Execute : BOOL; (*execution of this FB is started on rising edge of the input*)
+		Velocity : REAL; (*maximum velocity*)
+		Acceleration : REAL; (*maximum acceleration*)
+		Deceleration : REAL; (*maximum deceleration*)
+		Jerk : REAL; (*maximum jerk*)
+		Mode : McCamAutPrepRestartModeEnum; (*mode of preparing restart*)
+		AdvancedParameters : McAdvCamAutPrepRestartParType; (*Additional input parameters for optional use with the function block.*)
+	END_VAR
+	VAR_OUTPUT
+		Done : BOOL; (*execution successful. FB finished*)
+		Busy : BOOL; (*FB is active and needs to be called*)
+		Active : BOOL; (*FB has control over the axis*)
+		CommandAborted : BOOL; (*Command was aborted by another command*)
+		Error : BOOL; (*error occurred during operation*)
+		ErrorID : DINT; (*error number*)
+		RestartPosition : LREAL; (*Restart position*)
+	END_VAR
+	VAR
+		Internal : McInternalType; (*internal variable*)
+	END_VAR
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK MC_BR_CheckRestorePositionData (*checks the data for a permanent variable that can be used to save and restore the axis position*)
+    VAR_INPUT
+        Axis : REFERENCE TO McAxisType; (*Axis reference*)
+        Execute : BOOL; (*Execution of this FB is started on rising edge of the input*)
+        DataAddress : UDINT; (*Address of a permanent variable of type McAcpAxRestorePosType or McStpAxRestorePosType*)
+    END_VAR
+    VAR_OUTPUT
+        Done : BOOL; (*Execution successful. FB finished*)
+        Busy : BOOL; (*FB is active and needs to be called*)
+        Error : BOOL; (*Error occurred during operation*)
+        ErrorID : DINT; (*Error number*)
+        DataInUse : BOOL; (*Indicates that the DataAddress for restoring the axis position is in use*)
+        DataValid : BOOL; (*Indicates that the data in the permanent variable for restoring the axis position is valid*)
+    END_VAR
+    VAR
+        Internal : McInternalType; (*Internal variable*)
+    END_VAR
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK MC_BR_CamDwell (*Starts a coupling between the master and slave axis with a repeated sequence of a user defined cam followed by an optional standstill.*)
+	VAR_INPUT
+		Master : REFERENCE TO McAxisType; (*Master axis reference*)
+		Slave : REFERENCE TO McAxisType; (*Slave axis reference*)
+        Enable : BOOL; (*The function block is active as long as this input is set.*)
+        InitData : BOOL; (*Initializes input data on a rising edge (online change of function block input data)*)
+        CamID : UINT; (*ID of the cam*)
+		MasterScaling : DINT; (*Master gauge factor for the cam.*)
+		SlaveScaling : DINT; (*Slave gauge factor for the cam.*)
+		MasterStartPosition : LREAL; (*Position within the period of the master axis or absolute position on a non-periodic master axis for beginning the cam. [measurement units of master]*)
+		MasterDwellDistance : LREAL; (*Length of the dwell (slave at standstill) range on the master axis. [measurement units of master]*)
+		AdvancedParameters : McAdvBrCamDwellParType; (* Additional input parameters for optional use with the function block.*)
+		LeadIn : BOOL; (*Lead-in command signal.*)
+		LeadOut : BOOL; (*Lead-out command signal.*)
+	END_VAR
+	VAR_OUTPUT
+		Valid : BOOL; (*The function block's output values can be used.*)
+		Busy : BOOL; (*The function block is active and must continuously be called.*)
+		CommandAborted : BOOL; (*Function block is aborted by another command.*)
+		Error : BOOL; (*Error occurred during operation.*)
+        ErrorID : DINT; (*Error number.*)
+        DataInitialized : BOOL; (*Changes to function block inputs initialized.*)
+        Running : BOOL; (*The coupling is engaged.*)
+        InLeadIn : BOOL; (*Coupling is in the lead-in movement range.*)
+        InCam : BOOL; (* Coupling is in the cam range.*)
+		InDwell : BOOL; (* Coupling is in the dwell range.*)
+        InLeadOut : BOOL; (*Coupling is in the lead-in movement range.*)
+	END_VAR
+	VAR
+        Internal : McInternalTwoRefType; (*internal variable*)
+ 	END_VAR
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK MC_BR_AutoCamDwell (*Starts a coupling between the master and slave axis with a repeated sequence of an automatically generated cam followed by an optional standstill.*)
+	VAR_INPUT
+		Master : REFERENCE TO McAxisType; (*Master axis reference*)
+		Slave : REFERENCE TO McAxisType; (*Slave axis reference*)
+        Enable : BOOL; (*The function block is active as long as this input is set.*)
+        InitData : BOOL; (*Initializes input data on a rising edge (online change of function block input data)*)
+		MasterLength : LREAL; (*Length of the automatically calculated cam on the master axis. [measurement units of master]*)
+		SlaveLength : LREAL; (*Length of the automatically calculated cam on the slave axis. [measurement units of slave]*)
+		MasterStartPosition : LREAL; (*Position within the period of the master axis or absolute position on a non-periodic master axis for beginning the cam. [measurement units of master]*)
+		MasterDwellDistance : LREAL; (*Length of the dwell (slave at standstill) range on the master axis. [measurement units of master]*)
+		AdvancedParameters : McAdvBrAutoCamDwellParType; (* Additional input parameters for optional use with the function block.*)
+		LeadIn : BOOL; (*Lead-in command signal.*)
+		LeadOut : BOOL; (*Lead-out command signal.*)
+	END_VAR
+	VAR_OUTPUT
+		Valid : BOOL; (*The function block's output values can be used.*)
+		Busy : BOOL; (*The function block is active and must continuously be called.*)
+		CommandAborted : BOOL; (*Function block is aborted by another command.*)
+		Error : BOOL; (*Error occurred during operation.*)
+        ErrorID : DINT; (*Error number.*)
+        DataInitialized : BOOL; (*Changes to function block inputs initialized.*)
+        Running : BOOL; (*The coupling is engaged.*)
+        InLeadIn : BOOL; (*Coupling is in the lead-in movement range.*)
+        InCam : BOOL; (* Coupling is in the cam range.*)
+		InDwell : BOOL; (* Coupling is in the dwell range.*)
+        InLeadOut : BOOL; (*Coupling is in the lead-in movement range.*)
+	END_VAR
+	VAR
+        Internal : McInternalTwoRefType; (*internal variable*)
+ 	END_VAR
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK MC_BR_CamTransition (*Starts a cyclically repeating cam compensation sequence between the master and slave axis with an optional lead in and lead out.*)
+	VAR_INPUT
+		Master : REFERENCE TO McAxisType; (*Master axis reference*)
+		Slave : REFERENCE TO McAxisType; (*Slave axis reference*)
+        Enable : BOOL; (*The function block is active as long as this input is set.*)
+        InitData : BOOL; (*Initializes input data on a rising edge (online change of function block input data)*)
+        CamID : UINT; (*ID of the cam*)
+		MasterScaling : DINT; (*Master gauge factor for the cam.*)
+		SlaveScaling : DINT; (*Slave gauge factor for the cam.*)
+		MasterInterval : LREAL; (*Interval of the master axis (defines the master length of cam + compensation and the starting interval). [measurement units of master]*)
+		SlaveInterval : LREAL; (*Interval of the slave axis (defines the slave length of cam + compensation). [measurement units of slave]*)
+		MasterStartPosition : LREAL; (*Position within the period of the master axis or absolute position on a non-periodic master axis for beginning the cam. [measurement units of master]*)
+		AdvancedParameters : McAdvBrCamTransitionParType; (*Additional input parameters for optional use with the function block.*)
+		LeadIn : BOOL; (*Couples with the cam on a rising edge.*)
+		LeadOut : BOOL; (*Decouples from the cam on a rising edge.*)
+	END_VAR
+	VAR_OUTPUT
+		Valid : BOOL; (*The function block's output values can be used.*)
+		Busy : BOOL; (*The function block is active and must continuously be called.*)
+		CommandAborted : BOOL; (*Function block is aborted by another command.*)
+		Error : BOOL; (*Error occurred during operation.*)
+        ErrorID : DINT; (*Error number.*)
+        DataInitialized : BOOL; (*Changes to function block inputs initialized.*)
+        Running : BOOL; (*The coupling is engaged.*)
+		InLeadIn : BOOL; (*Lead-in movement for the cam is active.*)
+        InCam : BOOL; (*Coupling is initiated. The slave axis follows the master axis in cam range.*)
+		InTransition : BOOL; (*Coupling is in the transition range.*)
+        InLeadOut : BOOL; (*Lead-out movement from the cam is active.*)
+	END_VAR
+	VAR
+        Internal : McInternalTwoRefType; (*internal variable*)
+ 	END_VAR
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK MC_BR_EventMoveAbsolute (*starts a controlled absolute movement to a specified position with given velocity, acceleration and jerk after a specified event*)
+	VAR_INPUT
+		Axis : REFERENCE TO McAxisType; (*Axis reference*)
+		Execute : BOOL; (*Execution of the function block begins on a rising edge of this input*)
+		Position : LREAL; (*Target position for the movement [Measurement units]*)
+		Velocity : REAL; (*Maximum velocity [Measurement units/s]*)
+		Acceleration : REAL; (*Maximum acceleration [Measurement units / s2]*)
+		Deceleration : REAL; (*Maximum deceleration [Measurement units / s2]*)
+		Jerk : REAL; (*Maximum jerk [Measurement Units / s3]*)
+		Direction : McDirectionEnum; (*Direction of movement*)
+		Event : McEventType; (*Input used as the event source*)
+		AdvancedParameters : McAdvEventMoveParType; (*Structure for using advanced functions*)
+	END_VAR
+	VAR_OUTPUT
+		InPosition : BOOL; (*Specified target position reached*)
+		Busy : BOOL; (*Function block is active and must continue to be called*)
+		Active : BOOL; (*Indicates that the function block is currently controlling the axis*)
+		CommandAborted : BOOL; (*Function block aborted by another command*)
+		Error : BOOL; (*Error occurred during execution.*)
+		ErrorID : DINT; (*Error number*)
+		WaitingForEvent : BOOL; (*FB is active and drive function is waiting for the start event*)
+	END_VAR
+	VAR
+		Internal : McInternalType; (*Internal variable*)
+	END_VAR
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK MC_BR_EventMoveAdditive (*starts a controlled additive movement of specified distance with given velocity, acceleration and jerk after a specified event*)
+	VAR_INPUT
+		Axis : REFERENCE TO McAxisType; (*Axis reference*)
+		Execute : BOOL; (*Execution of the function block begins on a rising edge of this input.*)
+		Distance : LREAL; (*Relative distance covered by the movement*)
+		Velocity : REAL; (*Maximum velocity [Measurement units/s]*)
+		Acceleration : REAL; (*Maximum acceleration [Measurement units / s2]*)
+		Deceleration : REAL; (*Maximum deceleration [Measurement units / s2]*)
+		Jerk : REAL; (*Maximum jerk [Measurement Units / s3]*)
+		Event : McEventType; (*Input used as the event source*)
+		AdvancedParameters : McAdvEventMoveParType; (*Structure for using advanced functions*)
+	END_VAR
+	VAR_OUTPUT
+		InPosition : BOOL; (*Specified distance reached*)
+		Busy : BOOL; (*Function block is active and must continue to be called*)
+		Active : BOOL; (*Indicates that the function block is currently controlling the axis*)
+		CommandAborted : BOOL; (*Function block aborted by another command*)
+		Error : BOOL; (*Error occurred during execution*)
+		ErrorID : DINT; (*Error number*)
+		WaitingForEvent : BOOL; (*FB is active and drive function is waiting for the start event*)
+	END_VAR
+	VAR
+		Internal : McInternalType; (*Internal variable*)
+	END_VAR
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK MC_BR_EventMoveVelocity (*starts a controlled movement with given velocity, acceleration and jerk after a specified event*)
+	VAR_INPUT
+		Axis : REFERENCE TO McAxisType; (*Axis reference*)
+		Execute : BOOL; (*Starts the execution of the FB on the rising edge*)
+		Velocity : REAL; (*Target velocity [Measurement units/s]*)
+		Acceleration : REAL; (*Maximum acceleration [Measurement units / s2]*)
+		Deceleration : REAL; (*Maximum deceleration [Measurement units / s2]*)
+		Jerk : REAL; (*Maximum jerk [Measurement Units / s3]*)
+		Direction : McDirectionEnum; (*Direction of movement*)
+		Event : McEventType; (*Input used as the event source*)
+		AdvancedParameters : McAdvEventMoveParType; (*Structure for using advanced functions*)
+	END_VAR
+	VAR_OUTPUT
+		InVelocity : BOOL; (*Specified velocity reached*)
+		Busy : BOOL; (*Function block is active and must continue to be called*)
+		Active : BOOL; (*Indicates that the function block is currently controlling the axis*)
+		CommandAborted : BOOL; (*Function block aborted by another command*)
+		Error : BOOL; (*Error occurred during execution*)
+		ErrorID : DINT; (*Error number*)
+		WaitingForEvent : BOOL; (*FB is active and drive function is waiting for the start event*)
+	END_VAR
+	VAR
+		Internal : McInternalType; (*Internal variable*)
+	END_VAR
+END_FUNCTION_BLOCK
+
+FUNCTION_BLOCK MC_BR_ForceHardwareInputs (*Forces HW inputs of a real axis*)
+    VAR_INPUT
+        Axis : REFERENCE TO McAxisType; (*Axis reference*)
+        Enable : BOOL; (*FB is active as long as input is set*)
+        HomingSwitch : BOOL; (*Logical state of the homing switch*)
+        PositiveLimitSwitch : BOOL; (*Logical state of the positive limit switch*)
+        NegativeLimitSwitch : BOOL; (*Logical state of the negative limit switch*)
+        Trigger1 : BOOL; (*Logical state of trigger 1*)
+        Trigger2 : BOOL; (*Logical state of trigger 2*)
+    END_VAR
+    VAR_OUTPUT
+        Valid : BOOL; (*The function block's output values can be used*)
+        Busy : BOOL; (*The function block is active and must continuously be called*)
+        Error : BOOL; (*Error occurred during operation*)
+        ErrorID : DINT; (*Error number*)
+        Ready : BOOL; (* Function block is ready for input changes*)
+    END_VAR
+    VAR
+        Internal : McInternalType;(*internal variable*)
+    END_VAR
+END_FUNCTION_BLOCK
