@@ -6,6 +6,7 @@
 		<Page refId="pageResult" />
 		<Page refId="pageLights" />
 		<Page refId="pageNettime" />
+		<Page refId="pageColor" />
 		<Page refId="RecipePage" />
 		<Page refId="pageImageArchiv" />
 	</Pages>
@@ -21,7 +22,9 @@
 		<BindingsSet refId="Match_binding" />
 		<BindingsSet refId="OCR_binding" />
 		<BindingsSet refId="MT_binding" />
+		<BindingsSet refId="Pixel_binding" />
 		<BindingsSet refId="Nettime_binding" />
+		<BindingsSet refId="Color_binding" />
 		<BindingsSet refId="Lights_binding" />
 		<BindingsSet refId="Recipe_binding" />
 		<BindingsSet refId="ImageArchiv_binding" />
@@ -32,6 +35,7 @@
 		<EventBindingsSet refId="Navigation_eventbinding" />
 		<EventBindingsSet refId="Main_eventbinding" />
 		<EventBindingsSet refId="Results_eventbinding" />
+		<EventBindingsSet refId="Color_eventbinding" />
 		<EventBindingsSet refId="Lights_eventbinding" />
 		<EventBindingsSet refId="Recipe_eventbinding" />
 		<EventBindingsSet refId="ImageArchiv_eventbinding" />
@@ -46,6 +50,7 @@
 		<Content refId="contentMT" preCache="false"/>
 		<Content refId="contentOCR" preCache="false"/>
 		<Content refId="contentCodeReader" preCache="false"/>
+		<Content refId="contentPixel" preCache="false"/>
 	</Contents>
 	<SnippetsSets>
 		<!--<SnippetsSet refId=""/>-->

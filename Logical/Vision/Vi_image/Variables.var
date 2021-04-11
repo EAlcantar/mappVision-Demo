@@ -9,15 +9,25 @@ VAR
 	tmpStr : STRING[80];
 END_VAR
 (**)
-(*Filehandling*)
+(*Proxy variables*)
+VAR
+	nodeSTR : STRING[80];
+	ipSTR : STRING[80];
+	TcpForward_0 : TcpForward;
+END_VAR
+(**)
 VAR
 	DirCreate_0 : DirCreate;
+END_VAR
+(*Filehandling*)
+VAR
 	DirDeleteEx_0 : DirDeleteEx;
 	FileDelete_0 : FileDelete;
 END_VAR
 (**)
 (*Internal FBKs*)
 VAR
+	CfgGetIPAddr_0 : CfgGetIPAddr;
 	ViDownloadImage_0 : ViDownloadImage;
 	ViSaveImgOnPlc_0 : ViSaveImgOnPlc;
 	ViRefreshImageList_0 : ViRefreshImageList;
@@ -39,6 +49,8 @@ VAR
 	visWebViewerPath : STRING[80];
 	visWebViewerQuery : STRING[80];
 	visVC4RefreshImg : BOOL;
+	visImageRotation : USINT;
+	visTextAlignment : BOOL;
 END_VAR
 (**)
 (*Constants*)

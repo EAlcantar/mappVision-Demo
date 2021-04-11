@@ -48,7 +48,7 @@ SvgTexts.ContentBeginJS :=
 			var blueCrosshairs, redCrosshair, indices, infoTxt;
 			var amountElements;
 			var actIndex = 1;
-			var textInfo = ["Module ID: ", "Pos X: ", "Pos Y: ", "Orientation: ", "Clipped: ", "Gray: ", "Length: ", "Width: ", "Area: ", "Score: ", "Scale: ", "Grading: ", "Text: ", "Code Type: ", "Result: "];
+			var textInfo = ["Model ID: ", "Pos X: ", "Pos Y: ", "Orientation: ", "Clipped: ", "Gray: ", "Length: ", "Width: ", "Area: ", "Score: ", "Scale: ", "Grading: ", "Code Type: ", "Text: ", "Result: "];
 			var visTextInfo = [';
 SvgTexts.ContentBetween1 :=
 '];
@@ -125,7 +125,7 @@ SvgTexts.ContentCrossHairBegin :=
 SvgTexts.ContentCrossHairMiddle :=
 ')" transform="translate(';
 SvgTexts.ContentCrossHairEnd :=
-'/>
+')"/>
 ';
 SvgTexts.ContentCrossHairRed :=
 '
@@ -178,19 +178,15 @@ HtmlFileContent1 :=
 			html, body{
 				height: 100%;
 				width: 100%;
-				font: 14px Arial;
-				color: white;
-				background: #444;
+				background: #C0C0C0;
 				margin: 0;
 				padding: 0;
 			}
 			img {
 				width: 100%;
-				display: block;
+				height: auto;
 				margin-left: auto;
 				margin-right: auto;
-				content-fit: contain;
-				content-position: 50% 50%;
 			}
 			div {
 				height: 100%;
@@ -213,13 +209,40 @@ HtmlFileContent1 :=
 				}
 				var ImagePath 			= "http://';
 HtmlFileContent2 :=
-'" + getParameterByName("node") + ":8080/jpg";
+':8888/jpg";
 				var ErrorImagePath 		= "VisionEye.png";
 				var UpdateInterval_ms 	= 200;
 				var MissingImgCtr		= 0;
 				function updateImage() {
 					document.getElementById("imgCamera").setAttribute("src", ImagePath + "?q=" + getParameterByName("q") + "&" + Math.random());
 					var img = document.getElementById("imgCamera");
+					var rot = getParameterByName("rot");
+					var scale = getParameterByName("scale");
+					if (scale == 0){
+						scale = 1;
+					}
+					switch (rot) {
+						case "0":
+							move_x = 0;
+							move_y = 0;
+							break;
+						case "90":
+							move_x = img.height;
+							move_y = 0;
+							break;
+						case "180":
+							move_x = img.width;
+							move_y = img.height;
+							break;
+						case "270":
+							move_x = 0;
+							move_y = img.width;
+							break;
+						default: //same as 0
+							move_x = 0;
+							move_y = 0;
+					}
+					document.getElementById("imgCamera").setAttribute("style", "transform-origin: 0% 0%; transform: scale(" + scale + ") translate(" + move_x + "px," + move_y + "px) rotate(" + rot + "deg);");
 					if(img.naturalHeight !== 0 ) {
 						MissingImgCtr = 0;
 						showCameraImage() ;

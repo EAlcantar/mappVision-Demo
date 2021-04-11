@@ -108,6 +108,8 @@ FUNCTION_BLOCK ViDrawCrosshair
 		VisionSensor : REFERENCE TO typVisionMain;
 		CodeTypes : REFERENCE TO ARRAY[0..MAX_NUM_CODETYPES] OF STRING[80];
 		VisionDisabled : BOOL;
+		TextAlignment : BOOL; (*0: left, 1: right*)
+		ImageRotation_deg : UINT;
 		visCrossHair : REFERENCE TO typCrossHair;
 	END_VAR
 	VAR_OUTPUT
@@ -117,16 +119,21 @@ FUNCTION_BLOCK ViDrawCrosshair
 		idx : UINT;
 		SelectedSensorOld : UINT;
 		Blob : REFERENCE TO typBlobMain;
-		Match : REFERENCE TO typMatchMain;
 		CodeReader : REFERENCE TO typCodeReaderMain;
-		OCR : REFERENCE TO typOCRMain;
+		Match : REFERENCE TO typMatchMain;
 		MT : REFERENCE TO typMTMain;
+		Pixel : REFERENCE TO typPixelMain;
+		OCR : REFERENCE TO typOCRMain;
 		DetailsNoOld : USINT;
 		ShowCrosshairOld : BOOL;
-		CrosshairModelNumber : USINT;
-		CrosshairPositionX : REAL;
-		CrosshairPositionY : REAL;
-		CrosshairOrientation : INT;
+		ImageRotation_degOld : UINT;
+		TextAlignmentOld : BOOL;
+		ResultModelNumber : USINT;
+		ResultPositionX : REAL;
+		ResultPositionY : REAL;
+		ResultOrientation : REAL;
+		CrosshSize : REAL;
+		ScaleVertical : REAL;
 		svgTrafo : STRING[200];
 		svgContent : STRING[1000];
 		tmpStr : STRING[100];
@@ -140,7 +147,7 @@ FUNCTION_BLOCK ViCreateWebDirFile
 		Enable : BOOL;
 		FileDevUser : STRING[80];
 		EthDevice : STRING[80];
-		PlkIPWithoutNode : STRING[80];
+		EthIP : STRING[80];
 		visWebViewerPath : REFERENCE TO STRING[80];
 	END_VAR
 	VAR_OUTPUT
@@ -167,8 +174,8 @@ FUNCTION_BLOCK ViCreateWebDirFile
 		FileNameEyeUser : STRING[80];
 		EthIpAddr : STRING[80];
 		HtmlFileContent1 : STRING[1500];
-		HtmlFileContent2 : STRING[1500];
-		FileWriteData : STRING[3100];
+		HtmlFileContent2 : STRING[2000];
+		FileWriteData : STRING[3600];
 	END_VAR
 END_FUNCTION_BLOCK
 
@@ -218,13 +225,26 @@ FUNCTION_BLOCK ViShowImgOnVC4
 	END_VAR
 END_FUNCTION_BLOCK
 
-FUNCTION CrosshairDetailsText : BOOL
+FUNCTION CrosshairDetailsValue : BOOL
 	VAR_INPUT
 		strTarget : UDINT;
 		strText : UDINT;
 		fValue : REAL;
+		TextAlignment : BOOL;
 	END_VAR
 	VAR
-		tmpStr : STRING[50];
+		tmpStr : STRING[80];
+	END_VAR
+END_FUNCTION
+
+FUNCTION CrosshairDetailsText : BOOL
+	VAR_INPUT
+		strTarget : UDINT;
+		strText : UDINT;
+		adrText : UDINT;
+		TextAlignment : BOOL;
+	END_VAR
+	VAR
+		tmpStr : STRING[80];
 	END_VAR
 END_FUNCTION

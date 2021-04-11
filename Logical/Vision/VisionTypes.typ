@@ -22,6 +22,8 @@ TYPE
 		PowerlinkNode : USINT;
 		DataStructure : UDINT;
 		ComponentLink : ViComponentType;
+		ResolutionWidth_X : UINT; (*Nr of sensor pixels in x direction (width). Is always bigger than height*)
+		ResolutionHeight_Y : UINT; (*Nr of sensor pixels in y direction (height). Is always smaller than width*)
 	END_STRUCT;
 	typVisionFunction : 	STRUCT 
 		ApplicationName : STRING[40];
@@ -90,7 +92,8 @@ TYPE
 		enumCoderReader,
 		enumMatch,
 		enumMeasurement,
-		enumOCR
+		enumOCR,
+		enumPixelCounter
 		);
 END_TYPE
 
@@ -173,6 +176,48 @@ TYPE
 END_TYPE
 
 (*-----------------------------------------------------------------------------------------------------------------------------------------*)
+(*Color detection structures*)
+
+TYPE
+	typVisionColor : 	STRUCT 
+		CMD : typVisionColorCommand;
+		CFG : typVisionColorConfig;
+		DAT : typVisionColorData;
+	END_STRUCT;
+	typVisionColorCommand : 	STRUCT 
+		Evaluate : BOOL; (*Evaluate new product and try to determine the color*)
+		Teach : BOOL; (*Teach a new product and store color information*)
+		ResetError : BOOL; (*Reset error state*)
+	END_STRUCT;
+	typVisionColorConfig : 	STRUCT 
+		FlashColor1 : USINT := 1; (*First flash color (red)*)
+		FlashColor2 : USINT := 2; (*Second flash color (green)*)
+		FlashColor3 : USINT := 3; (*Third flash color (blue)*)
+		FlashColor4 : USINT := 4; (*Fourth flash color (lime)*)
+		ProductName : ARRAY[1..MAX_NUM_PRODUCTS]OF STRING[80]; (*Name of the product*)
+		GrayValue1 : ARRAY[1..MAX_NUM_PRODUCTS]OF UINT; (*Mean gray value for first flash color*)
+		GrayValue2 : ARRAY[1..MAX_NUM_PRODUCTS]OF UINT; (*Mean gray value for second flash color*)
+		GrayValue3 : ARRAY[1..MAX_NUM_PRODUCTS]OF UINT; (*Mean gray value for third flash color*)
+		GrayValue4 : ARRAY[1..MAX_NUM_PRODUCTS]OF UINT; (*Mean gray value for fourth flash color*)
+		TeachingIndex : UINT(1..1000)  := 1; (*Index that is currently taught*)
+		MaxError : UINT := 100; (*Maximum error for all gray values*)
+		MinDifference : UINT := 10; (*Minimum distance to next best value*)
+	END_STRUCT;
+	typVisionColorData : 	STRUCT 
+		GrayValue1 : UINT; (*Current mean gray value for first flash color*)
+		GrayValue2 : UINT; (*Current mean gray value for second flash color*)
+		GrayValue3 : UINT; (*Current mean gray value for third flash color*)
+		GrayValue4 : UINT; (*Current mean gray value for fourth flash color*)
+		TotalError : ARRAY[1..MAX_NUM_PRODUCTS]OF UINT; (*Total error of mean gray value for all products*)
+		LowError : UINT; (*Lowest error found*)
+		LowDistance : UINT; (*Distance to next best value*)
+		LowIndex : UINT; (*Index of the best value*)
+		LowName : STRING[80]; (*Product name of the best value*)
+		Status : UINT; (*Status of color detection*)
+	END_STRUCT;
+END_TYPE
+
+(*-----------------------------------------------------------------------------------------------------------------------------------------*)
 (*Image upload structures*)
 
 TYPE
@@ -196,11 +241,14 @@ TYPE
 		DirName : STRING[80];
 		PlkIPWithoutNode : STRING[80];
 		EthDevice : STRING[80];
+		EthIP : STRING[80];
 		ConvertCycles : UDINT;
 		Format : USINT; (*0: jpg. 1: bmp*)
 		QualityJPG : USINT;
 		UploadBmpJpg : BOOL;
 		UploadSVG : BOOL;
+		MainPageQualityJPG : USINT; (*quality of the jpg image on the main page. min:0, max:100, good value: 30*)
+		ImageRotation_deg : UINT; (*rotation of the whole image, steps in degree. Only values 0, 90. 180, 270 make sense*)
 	END_STRUCT;
 	typVisionImageData : 	STRUCT 
 		Images : ARRAY[0..19]OF STRING[80];
@@ -260,6 +308,20 @@ TYPE
 		PositionX : ARRAY[1..MAX_NUM_RESULTS]OF DINT;
 		PositionY : ARRAY[1..MAX_NUM_RESULTS]OF DINT;
 		Orientation : ARRAY[1..MAX_NUM_RESULTS]OF INT;
+	END_STRUCT;
+	typPixelMain : 	STRUCT  (*OCR function structures*)
+		EnhancedPixelCounterInformation : BOOL := FALSE;
+		ModelNumber : ARRAY[1..MAX_NUM_RESULTS]OF USINT;
+		NumPixels : ARRAY[1..MAX_NUM_RESULTS]OF UDINT;
+		MinGray : ARRAY[1..MAX_NUM_RESULTS]OF USINT;
+		MaxGray : ARRAY[1..MAX_NUM_RESULTS]OF USINT;
+		MeanGray : ARRAY[1..MAX_NUM_RESULTS]OF UINT;
+		DeviationGray : ARRAY[1..MAX_NUM_RESULTS]OF UINT;
+		MedianGray : ARRAY[1..MAX_NUM_RESULTS]OF USINT;
+		ModelArea : ARRAY[1..MAX_NUM_RESULTS]OF UDINT;
+		NumConnectedComponents : ARRAY[1..MAX_NUM_RESULTS]OF UINT;
+		PositionX : ARRAY[1..MAX_NUM_RESULTS]OF DINT;
+		PositionY : ARRAY[1..MAX_NUM_RESULTS]OF DINT;
 	END_STRUCT;
 	typMTMain : 	STRUCT  (*MT function structures*)
 		UseResultAsXY : BOOL;

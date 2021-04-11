@@ -128,7 +128,8 @@ TYPE
 	(
 		mcPPM_READ,		 			(*Reads Parameterization*)
 		mcPPM_WRITE,	 			(*Write Parameterization*)
-		mcPPM_LOAD_FROM_CONFIG		(*Load P from Config*)
+		mcPPM_LOAD_FROM_CONFIG,		(*Load P from Config*)
+		mcPPM_SAVE_TO_CONFIG		(*Save P to Config*)
 	);
 
 	McProcessConfigModeEnum:
@@ -219,6 +220,10 @@ TYPE
 		vtable : DWORD; (**)
 	END_STRUCT;
 
+	McInternalTrackingPathIfType : 	STRUCT  (*Partial interface type (C only)*)
+		vtable : DWORD; (**)
+	END_STRUCT;
+
 	McExec1InternalType : STRUCT (*Internal structure-types for FB-processing*)
 		i_serno : UINT;
 		i_state : UINT;
@@ -234,10 +239,19 @@ TYPE
 		seqNo : DINT; (**)
 	END_STRUCT;
 
-	McPsmAxisType :McAxisType; (**)
+	McPsmAxisType : McAxisType; (**)
+
+	McApsmAxisType : McAxisType; (**)
+
+	McConvoyType : McAxisType; (**)
 
 	McAxesGroupType : 	STRUCT
 		controlif : REFERENCE TO McInternalAxesGroupIfType; (**)
+		mappLinkInternal : McInternalMappLinkType; (**)
+	END_STRUCT;
+
+	McTrackingPathType : 	STRUCT
+		controlif : REFERENCE TO McInternalTrackingPathIfType; (**)
 		mappLinkInternal : McInternalMappLinkType; (**)
 	END_STRUCT;
 

@@ -17,6 +17,8 @@ PROGRAM _INIT
 		gVisionImage.CFG.QualityJPG			:= 80;						// Quality for JPG images, larger numbers produce better images. Allowed values: 0 to 100, but values < ca 10 makes no sense
 		gVisionImage.CFG.UploadBmpJpg		:= TRUE;
 		gVisionImage.CFG.UploadSVG			:= TRUE;
+		gVisionImage.CFG.ImageRotation_deg	:= 0;
+		gVisionImage.CFG.MainPageQualityJPG	:= 30;
 	ELSE
 		brsmemcpy(ADR(gVisionImage.CFG), ADR(RemCfgImage), SIZEOF(RemCfgImage)); // Restore default values from remanent memory
 	END_IF
@@ -25,6 +27,15 @@ PROGRAM _INIT
 	// Call FBKs which interanally alloc memory once in the INIT
 	ViDownloadImage_0();
 	ViSaveImgOnPlc_0();
+	// Get IP address
+	CfgGetIPAddr_0.enable		:= TRUE;
+	CfgGetIPAddr_0.Len			:= SIZEOF(gVisionImage.CFG.EthIP);
+	CfgGetIPAddr_0.pDevice		:= ADR(gVisionImage.CFG.EthDevice);
+	CfgGetIPAddr_0.pIPAddr		:= ADR(gVisionImage.CFG.EthIP);
+	CfgGetIPAddr_0();
+	// Proxy server settings
+	TcpForward_0.ServerPort := 8888;
+	TcpForward_0.ConnectToPort := 8080 ; 			
 END_PROGRAM
 PROGRAM _CYCLIC
 	CASE Step OF
@@ -177,6 +188,18 @@ PROGRAM _CYCLIC
 			END_IF
 			brsmemset(ADR(gVisionImage.CMD), 0, SIZEOF(gVisionImage.CMD));
 	END_CASE
+	
+	// Proxy server cyclic call ( Only needed for information. ) 
+	ipSTR := gVisionImage.CFG.PlkIPWithoutNode;
+	brsitoa(visSelectedSensor, ADR(nodeSTR));
+	brsstrcat(ADR(ipSTR), ADR(nodeSTR));
+	IF brsstrcmp( ADR( TcpForward_0.ConnectToIp ),ADR( ipSTR )) <> 0 THEN
+		TcpForward_0.ConnectToIp := ipSTR ;
+		TcpForward_0.Enable := FALSE ;	
+	ELSE
+		TcpForward_0.Enable := gVisionSensor[visSelectedSensor].HW.Connected ; // Only enable if its connected
+	END_IF
+	TcpForward_0();
 
 	// Draw the crosshairs on the mainpage
 	ViDrawCrosshair_0.SelectedSensor		:= visSelectedSensor;
@@ -184,6 +207,8 @@ PROGRAM _CYCLIC
 	ViDrawCrosshair_0.VisionSensor			:= ADR(gVisionSensor[visSelectedSensor]);
 	ViDrawCrosshair_0.CodeTypes				:= ADR(CodeTypes);
 	ViDrawCrosshair_0.VisionDisabled		:= gVisionImage.DAT.VisionDisabled;
+	ViDrawCrosshair_0.ImageRotation_deg		:= gVisionImage.CFG.ImageRotation_deg;
+	ViDrawCrosshair_0.TextAlignment			:= visTextAlignment;
 	ViDrawCrosshair_0.visCrossHair			:= ADR(visCrossHair);
 	ViDrawCrosshair_0();
 	gVisionImage.CMD.RefreshCrosshair		:= FALSE;
@@ -193,13 +218,29 @@ PROGRAM _CYCLIC
 		ViCreateWebDirFile_0.Enable				:= TRUE;
 		ViCreateWebDirFile_0.FileDevUser		:= gVisionImage.CFG.FileDevice;
 		ViCreateWebDirFile_0.EthDevice			:= gVisionImage.CFG.EthDevice;
-		ViCreateWebDirFile_0.PlkIPWithoutNode	:= gVisionImage.CFG.PlkIPWithoutNode;
+		ViCreateWebDirFile_0.EthIP				:= gVisionImage.CFG.EthIP;
 		ViCreateWebDirFile_0.visWebViewerPath	:= ADR(visWebViewerPath);
 		ViCreateWebDirFile_0();
 	END_IF
-	visWebViewerQuery := 'jpg?q=30&node=';
-	brsitoa(gVisionSensor[visSelectedSensor].CFG.PowerlinkNode, ADR(tmpStr));
+	visWebViewerQuery := 'q=';
+	brsitoa(gVisionImage.CFG.MainPageQualityJPG, ADR(tmpStr));
 	brsstrcat(ADR(visWebViewerQuery), ADR(tmpStr));
+	brsstrcat(ADR(visWebViewerQuery), ADR('&rot='));
+	brsitoa(gVisionImage.CFG.ImageRotation_deg, ADR(tmpStr));
+	brsstrcat(ADR(visWebViewerQuery), ADR(tmpStr));
+	brsstrcat(ADR(visWebViewerQuery), ADR('&scale='));
+	CASE gVisionImage.CFG.ImageRotation_deg OF
+		0:		brsftoa(1.0, ADR(tmpStr));
+		90:		brsftoa(UINT_TO_REAL(gVisionSensor[visSelectedSensor].CFG.ResolutionHeight_Y) / UINT_TO_REAL(gVisionSensor[visSelectedSensor].CFG.ResolutionWidth_X), ADR(tmpStr));
+		180:	brsftoa(1.0, ADR(tmpStr));
+		270:	brsftoa(UINT_TO_REAL(gVisionSensor[visSelectedSensor].CFG.ResolutionHeight_Y) / UINT_TO_REAL(gVisionSensor[visSelectedSensor].CFG.ResolutionWidth_X), ADR(tmpStr));
+	ELSE
+		brsftoa(1.0, ADR(tmpStr));
+	END_CASE
+	brsstrcat(ADR(visWebViewerQuery), ADR(tmpStr));
+	
+	// Main page image rotation
+	gVisionImage.CFG.ImageRotation_deg := visImageRotation * 90;
 	
 	// Show camera image on VC4 visualization
 	ViShowImgOnVC4_0.Enable				:= ViCreateWebDirFile_0.Done; // Wait until the directory "web" is created
@@ -212,5 +253,20 @@ PROGRAM _CYCLIC
 		visVC4RefreshImg := FALSE;
 	END_IF
 	
+	// Refreh crosshairs when new image is available
+	IF EDGENEG(gVisionSensor[visSelectedSensor].CMD.ImageTrigger) THEN
+		gVisionImage.CMD.RefreshCrosshair := TRUE;
+	END_IF
+	gVisionImage.DAT.VisionDisabled := NOT gVisionSensor[visSelectedSensor].DAT.Enable;
+	
 	brsmemcpy(ADR(RemCfgImage), ADR(gVisionImage.CFG), SIZEOF(RemCfgImage)); // Save settings to remanent variable
+END_PROGRAM
+
+
+PROGRAM _EXIT
+  
+	(* After download make sure to close this connection. If this is not closed the functionblock cant retrieve the new information *)
+	TcpForward_0.Enable := FALSE;
+	TcpForward_0();
+    
 END_PROGRAM

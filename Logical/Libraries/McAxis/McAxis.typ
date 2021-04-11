@@ -100,11 +100,31 @@ TYPE
 		mcEVENT_SRC_TRIGGER2 := 1	(*Use Trigger 2 as an event source*)
 	);
 
+	McBrTouchProbeModeEnum :
+	(
+		mcTP_MODE_WITHOUT_PERIOD := 4, (*Do not use axis or window period.*)
+		mcTP_MODE_SHIFT_FROM_RESULT := 49, (*Shift window from detected trigger position.*)
+		mcTP_MODE_SHIFT_FROM_EXPECTED := 50 (*Shift window from expected trigger position.*)
+	);
+
 	McBrTriggerInfoStatusEnum :
 	(
 		mcTRG_STAT_WAITING := 0, (*Waiting for trigger event.*)
 		mcTRG_STAT_VALID := 1, (*A valid trigger event was detected.*)
 		mcTRG_STAT_MISSED := 2 (*No valid trigger event was detected in period.*)
+	);
+
+	McDisableModeEnum :
+	(
+		mcDISABLE_DEFAULT := 0, (*Switch to default setting at disable*)
+		mcDISABLE_KEEP_VALUE := 1 (*Keep value at disable*)
+	);
+
+	McEventMoveModeEnum :
+	(
+		mcEVENT_ONCE := 0, (* Single start of a movement after an event *)
+		mcEVENT_CYCLIC := 1, (* Cyclic start of a movement during standstill. Note: Not applicable for FB MC_BR_EventMoveVelocity. *)
+		mcEVENT_CYCLIC_ALL_EVENTS := 2 (* Cyclic start of a movement for all events *)
 	);
 
 	(*Structure types*)
@@ -128,6 +148,7 @@ TYPE
 		StartupCount : UDINT; (*Number of times the drive was started up since the last PLC start*)
 		CommunicationState : McCommunicationStateEnum; (*State of network communication*)
 		PLCopenState :  McAxisPLCopenStateEnum; (*Extended PLCopen state*)
+		InMotion : BOOL; (*Controlled movement on the axis*)
 	END_STRUCT;
 
 	McAdvVelCtrlParType : STRUCT
@@ -528,6 +549,81 @@ TYPE
 		MasterValueSource : McValueSrcEnum; (*Defines the source of the position to be read*)
 		MasterMaxVelocity : REAL; (*Maximum velocity of the master axis [measurement units of master/s]*)
 		Jerk : REAL; (**)
+	END_STRUCT;
+
+	McTriggerType : STRUCT
+		ValueSource : McValueSrcEnum; (*Value source selection*)
+		EventSource : McEventSrcEnum; (*Trigger event source selection*)
+		Edge : McEdgeEnum; (*Trigger event edge selection*)
+		TouchProbeID : USINT; (*Instance number of TouchProbe function on the selected axis*)
+	END_STRUCT;
+
+	McBrTriggerType : STRUCT
+		ValueSource : McValueSrcEnum; (*Data value source selection.*)
+		EventSource : McEventSrcEnum; (*Trigger event source selection.*)
+		Edge : McEdgeEnum; (*Trigger event edge selection.*)
+		MinWidth : LREAL; (*Minimum trigger event width for the event to be considered valid [measurement units].*)
+		MaxWidth : LREAL; (*Maximum trigger event width for the event to be considered valid [measurement units].*)
+		SensorDelay : REAL; (*Trigger event signal sensor delay [s].*)
+		DisableWidthEvaluationAtStart : BOOL; (*Ignore width monitoring if the function block is enabled on the high level of the trigger signal.*)
+	END_STRUCT;
+
+	McAdvBrTouchProbeParType : STRUCT
+		UseFirstTriggerPosition : BOOL; (*Capture position upon first trigger event.*)
+		UseAxisPeriod : BOOL; (*Use axis period for window period.*)
+		UpdatePeriod : BOOL; (*Detect and adapt to change of input "Period".*)
+		ReadTriggerWidth : BOOL; (*Enable reading and updating the "TriggerInfo.Width" value.*)
+	END_STRUCT;
+
+	McBrTriggerInfoType : STRUCT
+		Width : LREAL; (*Measured width (size) of the trigger event [measurement units].*)
+		Status : McBrTriggerInfoStatusEnum; (* Status of the trigger event.*)
+	END_STRUCT;
+
+	McDigCamSwitchOptionsParType : STRUCT
+		DataSet : ARRAY[0..4] OF McDigCamSwDataSetParType; (*Reference to the switch data*)
+		Period : LREAL; (*Period if an non periodic axis is used or an other period should be used*)
+		StartPosition : LREAL; (*Start position of the cam switch*)
+	END_STRUCT;
+
+	McDigCamSwDataSetParType : STRUCT
+		NumberOfSwitches : USINT; (*Number of switches with are used*)
+		SwitchPositions : ARRAY[0..63] OF McDigCamSwOnPositionsParType; (*Array with the switching positions*)
+	END_STRUCT;
+
+	 McDigCamSwOnPositionsParType : STRUCT
+		FirstOnPosition : LREAL; (*Lower limit at which the switch is on [Measurement units]*)
+		LastOnPosition : LREAL; (*Upper limit at which the switch is on [Measurement units]*)
+	 END_STRUCT;
+
+	McDigCamSwTrackOptionsParType : STRUCT
+		OnCompensation : REAL; (*Compensation time for the switch-on delay [s]*)
+		OffCompensation : REAL; (*Compensation time for the switch-off delay [s]*)
+		Filter : REAL; (*Filter time constant (for speed generation to compensate for switching delays) [s]*)
+		Hysteresis : REAL; (*Interval from the switching point (in the positive and negative direction) during which the output is not switched until the axis leaves this area. This prevents switching from taking place several times around the switching point. [Measurement units]*)
+		DisableNegativeDirection : BOOL; (*If this input is set, switching edges are only generated if the master axis is moving in the positive direction.*)
+	END_STRUCT;
+
+	McDigCamSwOptionsParType : STRUCT
+		FeatureName : STRING[250]; (*Name of the "Digital cam switch" feature The feature must be assigned to the axis as well inside the hardware configuration.*)
+	END_STRUCT;
+
+	McAdvCamAutPrepRestartParType : STRUCT
+	 	ToleranceWindow : LREAL; (* Tolerance window, used by several prepare restart modes [Measurement units]*)
+	END_STRUCT;
+
+	McCamAutPrepRestartModeEnum:
+	(
+		mcPREP_RESTART_POSITIVE, (* Slave axis moves to "RestartPosition" only in positive direction*)
+		mcPREP_RESTART_NEGATIVE, (* Slave axis moves to "RestartPosition" only in negative direction*)
+		mcPREP_RESTART_SHORTEST_WAY, (* Slave axis moves to "RestartPosition" by the shortest distance*)
+		mcPREP_RESTART_POSITIVE_WINDOW, (* Slave moves to "RestartPosition" by the shortest distance when distance is smaller than "ToleranceWindow", otherwise only in positive direction*)
+		mcPREP_RESTART_NEGATIVE_WINDOW, (* Slave moves to "RestartPosition" by the shortest distance when distance is smaller than "ToleranceWindow", otherwise only in negative direction*)
+		mcPREP_RESTART_GET_POSITION (* "RestartPosition" is output, no movement is performed*)
+	);
+
+	McAdvCyclicTorqueFFParType : STRUCT
+		DisableMode : McDisableModeEnum; (*Defines the behavior at disable*)
 	END_STRUCT;
 
 END_TYPE
